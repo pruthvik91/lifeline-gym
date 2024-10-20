@@ -1,0 +1,331 @@
+@import url(https://fonts.googleapis.com/css?family=Raleway:400,300,800);
+@import url(https://fonts.googleapis.com/css?family=Lato:300,700);
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+body {
+  background: whitesmoke;
+  font-weight: 400;
+  font-size: 1em;
+  font-family: 'Raleway', Arial, sans-serif;
+  
+}
+.container, figure {
+  width: 450px;
+  height: 270px;
+  
+}
+.container {
+  position: absolute;
+  perspective: 1000;
+  margin-top: -135px;
+  top: 50%;
+
+}
+.card {
+  position: relative;
+  transition: 0.6s;
+  transform-style: preserve-3d;
+  
+}
+figure {
+  background: #fff;
+  backface-visibility: hidden;
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.6s;
+  transform-style: preserve-3d;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.9);
+}
+figure.front {
+  transform: rotateY(0deg);
+  z-index: 2;
+  background: rgb(253,254,255);
+background: linear-gradient(180deg, rgba(253,254,255,1) 2%, rgba(241,255,0,1) 58%);
+}
+figure.front .qr img {
+  width: 70px;
+  height: 70px;
+  position: relative;
+  left: -40%;
+  top: 15px;
+  color: #000;
+}
+figure.front .left {
+  width: 280px;
+  height: 60px;
+  background-color: #ffffff;
+  position: fixed;
+  top: 128px;
+  left: -35px;
+  transform: skewx(40deg);
+}
+figure.front .left .des {
+  transform: skewx(-40deg);
+  position: absolute;
+  left: 90px;
+  top: -10px;
+}
+figure.front .left .des h5 {
+  position: fixed;
+  top: 36px;
+  left: 0px;
+  font-weight: 300;
+}
+figure.front .left .tri {
+  border: 20px solid #f0f006;
+  border-left: 0px solid transparent;
+  border-top: 20px solid transparent;
+  border-bottom: 20px solid transparent;
+  transform: skewX(-40deg) rotate(180deg);
+  position: absolute;
+  left: 50px;
+  top: 9px;
+}
+figure.front .left .top {
+  width: 200px;
+  height: 15px;
+  background-color: #f0f006;
+  position: fixed;
+  top: -15px;
+}
+figure.front .left .bottom {
+  width: 480px;
+  height: 15px;
+  background-color: #f0f006;
+  position: fixed;
+  top: 60px;
+  left: -10px;
+  z-index: 2;
+}
+figure.front .right {
+  width: 300px;
+  height: 30px;
+  background-color: #f0f006;
+  transform: skewX(-60deg);
+  position: fixed;
+  left: 76%;
+  top: 56%;
+  z-index: 2;
+}
+figure.front .right .logo {
+  width: 142px;
+  height: 71px;
+ 
+  transform: skewX(42deg);  
+border-radius: 3px;
+  position: absolute;
+  top: -155px;
+}
+
+figure.front .right .logo img {
+  width: 121px;
+  position: relative;
+  top: 2px;
+  margin-left: -154px;
+}
+figure.front .right .logo .desc {
+  width: 150px;
+  position: fixed;
+  left: -40px;
+  top: 50px;
+  font-size: 12px;
+  color: #222222;
+  letter-spacing: 1px;
+}
+figure.front .right .logo .desc h5 {
+  position: relative;
+  margin-top: 0;
+  font-family: 'Lato';
+  font-size: 10px;
+  font-weight: 500;
+  color: #f0f006;
+  top: -13px;
+}
+figure.front .right .add {
+  transform: skewX(42deg);
+}
+figure.front .right .add img {
+  width: 18px;
+  position: fixed;
+  top: 7px;
+  left: 2px;
+}
+figure.front .right .add h5 {
+  position: absolute;
+  top: 3px;
+  left: 2px;
+  font-family: 'open-sans';
+  color: #000000;
+  font-weight: 500;
+  font-size: 16px;
+}
+.foot {
+  width: 350px;
+  height: 20px;
+  background-color: #232323;
+  transform: skewX(-60deg);
+  position: fixed;
+  top: 110%;
+  left: 45%;
+  z-index: 2;
+}
+.foot .full {
+  width: 530px;
+  height: 80px;
+  background-color: #232323;
+  position: absolute;
+  left: -135px;
+  top: 8px;
+}
+.foot .full .icon {
+  transform: skewX(42deg);
+  position: fixed;
+  top: 23px;
+  left: -80px;
+}
+.foot .full .icon h5 {
+  position: fixed;
+  color: #fff;
+  z-index: 5;
+  top:-19px;
+  left: 23px;
+  font-family: 'Lato';
+  font-weight: 500;
+}
+.foot .full .icon img {
+  width: 27px;
+  background-color: #f0f006;
+  padding: 3px;
+}
+.foot .full .mail {
+  position: fixed;
+  left: 150px;
+}
+/* figure.back, .card.flipped {
+  transform: rotateY(180deg);
+} */
+figure.back {
+  background-color: #232323;
+}
+figure.back .logo {
+  width: 70px;
+  height: 70px;
+
+  transform: skewX(0deg);
+  border-radius: 50%;
+  position: absolute;
+  top: 60px;
+  left: 190px;
+}
+figure.back .logo img {
+  width: 60px;
+  position: relative;
+  top: 2px;
+}
+figure.back .logo .desc {
+  width: 200px;
+  position: fixed;
+  left: -62px;
+  top: 58px;
+  font-size: 15px;
+  color: #fff;
+  margin: 0;
+  letter-spacing: 2px;
+}
+figure.back .logo .desc h5 {
+  position: relative;
+  margin-top: 0;
+  font-family: 'Lato';
+  font-size: 12px;
+  font-weight: 500;
+  color: #019ade;
+  top: -14px;
+}
+figure.back .email {
+  width: 220px;
+  height: 45px;
+  position: fixed;
+  background-color: #f0f006;
+  top: 195px;
+  left: 22%;
+  z-index: 4;
+  transform: skewX(-40deg);
+}
+figure.back .email h5 {
+  position: absolute;
+  transform: skewX(40deg);
+  color: black;
+  font-weight: 600;
+  font-family: 'Lato';
+  font-size: 18px;
+  top: -30px;
+  left: 76px;
+  z-index: 4;
+}
+figure.back .email .right {
+  width: 90px;
+  height: 45px;
+  position: fixed;
+  background-color: #f0f006;
+  transform: skewX(60deg);
+  left: 77%;
+}
+figure.back .t1 {
+  border: 15px solid #f0f006;
+  border-left: 0px solid transparent;
+  border-top: 15px solid transparent;
+  border-bottom: 15px solid transparent;
+  transform: skewX(41deg) rotate(-90deg);
+  position: absolute;
+  left: -14px;
+  top: 22px;
+}
+figure.back .t2 {
+  border: 15px solid #f0f006;
+  border-left: 0px solid transparent;
+  border-top: 15px solid transparent;
+  border-bottom: 15px solid transparent;
+  transform: skewX(41deg) rotate(-90deg);
+  position: absolute;
+  left: 285px;
+  top: 22px;
+}
+figure.back .foot {
+  width: 450px;
+  height: 45px;
+  background-color: #fff;
+  position: relative;
+  top: 225px;
+  left: 0px;
+  transform: skewX(0deg);
+}
+@media (min-width: 450px) {
+  .container {
+    left: 50%;
+    margin-left: -225px;
+  }
+}
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printable-area, #printable-area * {
+    visibility: visible;
+  }
+  #printable-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+}
