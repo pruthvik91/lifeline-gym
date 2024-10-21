@@ -132,8 +132,10 @@ if ($wa_rowcount > 0) {
                         if ($days_remaining > 0) {
                           $badge_class = $days_remaining <= 7 ? 'badge-danger' : 'badge-success';
                           echo "<span class='badge $badge_class'>$days_remaining days remaining</span>";
+$message = "Congratulations! Your gym membership has been successfully upgraded.";
                         } else {
                           echo "<span class='badge badge-danger'>Expired</span>";
+$message = "Your gym membership ended. Don't miss out, renew today!";
                         }
                         ?>
                       <?php elseif ($row['status'] == 2) : ?>
@@ -330,7 +332,7 @@ if ($wa_rowcount > 0) {
       const wa_token = '<?php echo $wa_token ?>';
 
       const number = mobile_number;
-      const message = `Your gym membership ended. Don't miss out, renew today!`;
+      const message = `<?php echo $message; ?>`;
       var invoice_id = $('[name="invoice_id"]').val();
       var user_name = $('[name="user_name"]').val().trim();
       socket.emit('send-media', {
