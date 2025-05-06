@@ -32,7 +32,9 @@
 						<span class="">
 
 							<button class="btn btn-primary btn-block btn-sm col-sm-2 float-right ml-2 mt-2" type="button" id="send_message">
-								<i class="fa fa-paper-plane"></i> Send Message</button>
+								<i class="fa fa-paper-plane"></i> Send Receipt</button>
+							<button class="btn btn-primary btn-block btn-sm col-sm-2 float-right ml-2 mt-2" type="button" id="send_message_only">
+								<i class="fa fa-paper-plane"></i> Send Mesasge</button>
 								<button class="btn btn-primary btn-block btn-sm col-sm-2 float-right" type="button" id="new_member">
 								<i class="fa fa-plus"></i> New</button>
 						</span>
@@ -155,6 +157,9 @@
 	})
 	$('#send_message').click(function() {
 		window.location.href = 'index.php?page=send_expire_msg';
+	})
+	$('#send_message_only').click(function() {
+		window.location.href = 'index.php?page=send_msg_only';
 	})
 	$('.view_member').click(function(){
 		uni_modal("<i class='fa fa-address-card'></i> Member Plan Details","view_pdetails.php?id="+$(this).attr('data-id'),'')

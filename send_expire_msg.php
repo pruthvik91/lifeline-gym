@@ -86,9 +86,13 @@ if ($wa_rowcount > 0) {
                     <tbody>
                         <?php
                         $i = 1;
-                        $filter_date_end = isset($_POST['end_date']) ? $_POST['end_date'] : date('Y-m-d');
                         $filter_date_start = isset($_POST['start_date']) ? $_POST['start_date'] : date('Y-m-d');
-                        
+                        $filter_date_end = isset($_POST['end_date']) ? $_POST['end_date'] : date('Y-m-d');
+
+                        // Convert dates to 'YYYY-MM-DD' format
+                        $filter_date_start = DateTime::createFromFormat('Y-m-d', $filter_date_start) ? DateTime::createFromFormat('Y-m-d', $filter_date_start)->format('Y-m-d') : date('Y-m-d');
+                        $filter_date_end = DateTime::createFromFormat('Y-m-d', $filter_date_end) ? DateTime::createFromFormat('Y-m-d', $filter_date_end)->format('Y-m-d') : date('Y-m-d');
+
                         // Adjust the query to use both start and end dates
                         $member =  $conn->query("SELECT r.*, p.plan, pp.package, CONCAT(m.lastname, ' ', m.firstname, ' ', m.middlename) AS name, r.member_id, m.contact as mobile_number 
                             FROM registration_info r 
@@ -97,7 +101,6 @@ if ($wa_rowcount > 0) {
                             INNER JOIN packages pp ON pp.id = r.package_id 
                             WHERE r.status = 1 AND DATE_FORMAT(r.end_date, '%Y-%m-%d') BETWEEN '$filter_date_start' AND '$filter_date_end' 
                             ORDER BY r.end_date ASC");
-
                         while ($row = $member->fetch_assoc()) :
                         ?>
                             <tr class="main-tr">

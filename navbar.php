@@ -17,9 +17,10 @@
 				<?php if($_SESSION['login_type'] == 1): ?>
 				<a href="index.php?page=plans" class="nav-item nav-plans"><span class='icon-field'><i class="fa fa-th-list"></i></span> Plans</a>
 				<a href="index.php?page=packages" class="nav-item nav-packages"><span class='icon-field'><i class="fa fa-list"></i></span> Packages</a>
-				<a href="index.php?page=income" class="nav-item nav-income"><span class='icon-field'>₹</span> income</a>
+				<a href="index.php?page=income_expense" class="nav-item nav-card"><span class='icon-field'>₹</span> Income Expense</a>
+				<a href="index.php?page=income" class="nav-item nav-income"><span class='icon-field'>₹</span> Fees Total</a>
 				<a href="index.php?page=cardlist" class="nav-item nav-card"><span class='icon-field'></span> card</a>
-
+				
 				<a href="index.php?page=users" class="nav-item nav-users"><span class='icon-field'><i class="fa fa-users"></i></span> Users</a>
 				<a href="index.php?page=whatsapp-setting" class="nav-item nav-whatsapp"><span class='icon-field'><svg style="
     width: 20px;

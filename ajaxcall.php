@@ -62,11 +62,64 @@ if(isset($_POST['action']) && $_POST['action']!="")
             $retArray["status"] = "OK";
         }
     break;
-       
-        default:
-		$retArray["status"] = "ERROR";	
-    }
+     // GYM Income/Expense Management
+    //  CREATE TABLE transactions (
+    //     id INT AUTO_INCREMENT PRIMARY KEY,
+    //     type ENUM('income', 'expense') NOT NULL,
+    //     amount DECIMAL(10,2) NOT NULL,
+    //     description VARCHAR(255),
+    //     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    // );
     
+     case 'add':
+        $type = $_POST['type'] ?? '';
+        $amount = $_POST['amount'] ?? 0;
+        $description = $_POST['description'] ?? '';
+
+        $stmt = $conn->prepare("INSERT INTO transactions (type, amount, description) VALUES (?, ?, ?)");
+        $stmt->bind_param("sds", $type, $amount, $description);
+        $retArray["status"] = $stmt->execute() ? "OK" : "ERROR";
+        break;
+
+    case 'get':
+        $result = $conn->query("SELECT * FROM transactions ORDER BY created_at DESC");
+        $data = [];
+        $income = 0;
+        $expense = 0;
+
+        while ($row = $result->fetch_assoc()) {
+            if ($row['type'] == 'income') $income += $row['amount'];
+            if ($row['type'] == 'expense') $expense += $row['amount'];
+            $data[] = $row;
+        }
+
+        $retArray["status"] = "OK";
+        $retArray["data"] = $data;
+        $retArray["income"] = $income;
+        $retArray["expense"] = $expense;
+        $retArray["balance"] = $income - $expense;
+        break;
+
+    case 'update':
+        $id = $_POST['id'] ?? 0;
+        $amount = $_POST['amount'] ?? 0;
+        $description = $_POST['description'] ?? '';
+
+        $stmt = $conn->prepare("UPDATE transactions SET amount=?, description=? WHERE id=?");
+        $stmt->bind_param("dsi", $amount, $description, $id);
+        $retArray["status"] = $stmt->execute() ? "OK" : "ERROR";
+        break;
+
+    case 'delete':
+        $id = $_POST['id'] ?? 0;
+        $stmt = $conn->prepare("DELETE FROM transactions WHERE id=?");
+        $stmt->bind_param("i", $id);
+        $retArray["status"] = $stmt->execute() ? "OK" : "ERROR";
+        break;
+    
+        default:
+            echo "invalid";
+        }
 
     ob_clean();
 	echo json_encode($retArray);
