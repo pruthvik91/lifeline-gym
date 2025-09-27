@@ -468,7 +468,8 @@ class Action
 		extract($_POST);
 		$prev = $this->db->query("SELECT * FROM registration_info where id = $rid")->fetch_array();
 		$data = '';
-		
+		$new_plan_id = !empty($new_plan_id) ? $new_plan_id : $prev['plan_id'];
+		$prev['plan_id'] = $new_plan_id;
 		foreach ($prev as $k => $v) {
 			if (!empty($v) && !is_numeric($k) && !in_array($k, array('id', 'start_date', 'end_date', 'date_created'))) {
 				if (empty($data))
@@ -479,10 +480,8 @@ class Action
 				
 			}
 		}
-		
 		$data .= ", start_date ='" . $prev['end_date'] . "' ";
-		
-		$plan = $this->db->query("SELECT * FROM plans where id = $plan_id")->fetch_array()['plan'];
+		$plan = $this->db->query("SELECT * FROM plans where id = $new_plan_id")->fetch_array()['plan'];
 		$data .= ", end_date ='" . date("Y-m-d", strtotime($prev['end_date'] . ' +' . $plan . ' months')) . "' ";
 		$save = $this->db->query("INSERT INTO registration_info set $data");
 		if ($save) {

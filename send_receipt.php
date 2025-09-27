@@ -76,6 +76,7 @@ if (!empty($id) && $wp === 'send') {
 		margin-left: 60px;
 		max-height: 150px;
 	}
+	
 </style>
 <!-- <script type="text/javascript" src="assets/js/jquery-te-1.4.0.min.js" charset="utf-8"></script> -->
 <div class="container" id="htmlContent">
@@ -318,14 +319,13 @@ if (!empty($id) && $wp === 'send') {
         </div>
   </section>
 </div>
+<?php if(!isset($_GET['wp']) && $_GET['wp']=='send'){?>
 <div class="invoice-footer">
-  <a id="download"  class="button" onclick="downloadInvoice()">Download</a>
-  <a id="whatsapp_send" class="button whatsapp_btn">Send Invoice</a>
+  <a id="download"  class="button" onclick="downloadReceipt()">Download</a>
+  <a id="whatsapp_send" class="button whatsapp_btn" onclick="sendInvoice()">Send Invoice</a>
 </div>
-<?php // At the beginning of send_receipt.php
-// Log incoming parameters
-echo json_encode(['status' => 'success', 'message' => 'Message sent successfully.']);
- ?>
+<?php }
+?>
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <script src="assets/js/socket.io.min.js"></script>
 <script src="assets/js/sweetalert2.js"></script>
@@ -355,158 +355,58 @@ echo json_encode(['status' => 'success', 'message' => 'Message sent successfully
       allowEscapeKey: false
     });
   }
+// <script type="text/javascript">
+const socket = io('http://localhost:3000');
 
+socket.on('connect', () => {
+    console.log('✅ Connected to WhatsApp socket');
+});
 
-  function sendInvoice() {
-  var mobile_number = $("input[name='mobile_number']").val();
-  mobile_number = createWhatsappPhone(mobile_number);
-  const socket = io('localhost:3000');
-  let connectionAttempts = 0;
-  const maxRetries = 3;
-
-  socket.on('connect', function() {
-    console.log('Connected to the Socket');
-  });
-
-  socket.on('connect_error', function(error) {
-    connectionAttempts++;
-    if (connectionAttempts >= maxRetries) {
-      console.log('Max connection attempts reached. Stopping Socket.');
-      errorMessage('Please try again after some time.', 'Server Disconnected!', '', 'error');
-      $("#whatsapp_send").html('Send Message').prop('disabled', false);
-      socket.disconnect();
-      return; // Exit the function on error
-    }
-  });
-
-  html2canvas(document.getElementById('htmlContent')).then(function(canvas) {
-    const base64PDF = canvas.toDataURL('image/png');
-
-    const wa_token = '<?php echo $wa_token ?>';
-    const number = mobile_number;
-    const message = `Your gym membership ended. Don't miss out, renew today!`;
-    var invoice_id = $('[name="invoice_id"]').val();
-    var user_name = $('[name="user_name"]').val().trim();
-
-    socket.emit('send-media', {
-      wa_token: wa_token,
-      number: number,
-      message: message,
-      base64Data: base64PDF
-    });
-
-    socket.on('messageStatus', function(data) {
-        if (data.code == '200') {
+socket.on('messageStatus', function(data) {
+    if (data.status === 200) {
         Toast.fire({
             icon: 'success',
             title: 'Message sent successfully'
-        }).then((result) => {
-            // Notify the parent to remove the iframe
-            
-            var data = {
-                action: 'message_log',
-                user_id: <?php echo $_SESSION["login_id"]; ?>,
-                member_id: invoice_id,
-                to_number: number,
-                wa_token: wa_token,
-                status: 1
-            }
-            $.ajax({
-                type: "POST",
-                url: "ajaxcall.php",
-                ContentType: 'application/json',
-                dataType: 'json',
-                data: data,
-                success: function(data) {
-                    if (data.status == 'OK') {
-                        window.parent.removeIframe('iframe_'+invoice_id,'success');
-                    } else {
-
-                    }
-                },
-                error: function(data) {
-                },
-                complete: function(data) {
-                    // You can perform additional actions here if needed
-                }
-            });
         });
-      } else {
-        window.parent.removeIframe('iframe_'+invoice_id,'failed');
-        errorMessage('Message could not be sent. Please try again.', 'Error Sending Message', '', 'error');
-        $("#whatsapp_send").html('Send Message').prop('disabled', false);
-        socket.disconnect();
-        return; // Exit the function on error
-      }
-    });
+    } else {
+        errorMessage(data.error || 'Message failed to send', 'Error', '', 'error');
+    }
+});
 
-    socket.on('userLogout', function(userLogout) {
-      if (userLogout.code == 401) {
-        var data = {
-          action: 'authenticateWhatsappSession',
-          user_id: <?php echo $_SESSION["login_id"]; ?>,
-          wa_token: userLogout.wa_token,
-          status: 0
-        }
-        $.ajax({
-          type: "POST",
-          url: "ajaxcall.php",
-          ContentType: 'application/json',
-          dataType: 'json',
-          data: data,
-          success: function(data) {
-            if (data.status == 'OK') {
-              $("#WhatsappModal #btnSubmit").html('<i class="fa fa-paper-plane"></i>Share on whatsapp');
-              $("#WhatsappModal #btnSubmit").prop('disabled', false);
-              $('#WhatsappModal').modal('toggle');
-              errorMessage('Please Login With WhatsApp', 'Whatsapp is Logout', '', 'error');
-            } else {
-              errorMessage('Please try again!', 'Something went wrong', '', 'error');
-            }
-          },
-          error: function(data) {
-            errorMessage('AJAX request failed. Please try again.', 'AJAX Error', '', 'error');
-          },
-          complete: function(data) {
-            // You can perform additional actions here if needed
-          }
+function sendInvoice() {
+    const mobile_number = createWhatsappPhone($("input[name='mobile_number']").val());
+    if (!mobile_number) return errorMessage('Invalid phone number!');
+
+    const invoice_id = $('[name="invoice_id"]').val();
+    const user_name = $('[name="user_name"]').val().trim();
+    const wa_token = '<?php echo $wa_token ?>';
+
+    html2canvas(document.getElementById('htmlContent')).then(function(canvas) {
+        const base64Data = canvas.toDataURL('image/png');
+
+        socket.emit('send-media', {
+            to: mobile_number,
+            base64Data: base64Data,
+            filename: `invoice-${invoice_id}.png`,
+            mimeType: "image/png",
+            caption: `Hello ${user_name}, your invoice is attached.`
         });
 
-      } else {
-        errorMessage(userLogout.message, 'Something went wrong', '', 'error');
-      }
+    }).catch(function(err) {
+        errorMessage('Could not generate invoice image. Please try again.', 'Error', '', 'error');
     });
-  }).catch(function(err) {
-    errorMessage('Could not generate invoice image. Please try again.', 'Error', '', 'error');
-    $("#whatsapp_send").html('Send Message').prop('disabled', false);
-  });
 }
 
-  function createWhatsappPhone(number) {
-    number = number.replace("+", "");
-    number = number.replace("/", "");
-    number = number.replace("/", "");
-    number = number.replace(" ", "");
-    number = number.replace(" ", "");
-    number = number.replace("-", "");
-    number = number.replace("-", "");
-    if (!(/^\d+$/.test(number))) {
-      return false;
-    } else if (/^\d+$/.test(number) && number.length < 10) {
-      return false;
-    } else if (number.startsWith("91") && number.length == 12) {
-      return number;
-    } else if (number.startsWith("0") && number.length == 11) {
-      number = number.substring(1);
-      return "91" + number;
-    } else if (/^\d+$/.test(number) && number.length == 10) {
-      return "91" + number;
-    } else if (/^\d+$/.test(number)) {
-      return number;
-    } else {
-      return false;
-    }
-  }
+// Normalize phone number to WhatsApp format
+function createWhatsappPhone(number) {
+    number = number.replace(/\D/g, ''); // remove non-digits
+    if (number.length === 10) return '91' + number;
+    if (number.length === 12 && number.startsWith('91')) return number;
+    if (number.length === 11 && number.startsWith('0')) return '91' + number.substring(1);
+    return false;
+}
+
+
 </script>
 
 
@@ -525,11 +425,22 @@ echo json_encode(['status' => 'success', 'message' => 'Message sent successfully
       closeOpenModal();
     }
   });
+  
+
+  // Download receipt function
+  function downloadReceipt() {
+    removeOverlays();
+    
+    // Wait a moment for styles to apply
+    setTimeout(() => {
+      window.print();
+    }, 100);
+  }
 </script><?php
 if(isset($_GET['wp']) && $_GET['wp']=='send')
 {?>
 <script>
-    sendInvoice();
+    // sendInvoice();
     </script>
 <?php }
 }

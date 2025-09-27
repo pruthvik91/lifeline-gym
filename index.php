@@ -19,7 +19,8 @@
 </head>
 <style>
 	body{
-        background: #80808045;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        min-height: 100vh;
   }
   .modal-dialog.large {
     width: 80% !important;

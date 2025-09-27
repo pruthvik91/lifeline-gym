@@ -5,7 +5,7 @@
 
 <!-- Google Fonts -->
 <link
-    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i|Inter:300,400,500,600,700,800,900"
     rel="stylesheet">
 <link rel="stylesheet" href="assets/font-awesome/css/all.min.css">
 
@@ -27,6 +27,8 @@
 
 <!-- Template Main CSS File -->
 <link href="assets/css/style.css" rel="stylesheet">
+<!-- Modern Theme CSS -->
+<link href="assets/css/modern-theme.css" rel="stylesheet">
 <link type="text/css" rel="stylesheet" href="assets/css/jquery-te-1.4.0.css">
 <link href="assets/css/jquery-ui.min.css" rel="stylesheet">
 <!-- heh -->

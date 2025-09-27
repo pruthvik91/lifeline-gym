@@ -1,6 +1,9 @@
-<?php 
-
-?>
+<style>
+	body:not(.has-navbar) main#view-panel {
+    margin-top: 5rem;
+    padding-top: 2rem;
+}
+	</style>
 
 <div class="container-fluid">
 	

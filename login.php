@@ -5,86 +5,105 @@ session_start();
 include('./db_connect.php');
 ob_start();
 if (!isset($_SESSION['system'])) {
-	// $system = $conn->query("SELECT * FROM system_settings limit 1")->fetch_array();
-	// foreach($system as $k => $v){
-	// 	$_SESSION['system'][$k] = $v;
-	// }
+    // $system = $conn->query("SELECT * FROM system_settings limit 1")->fetch_array();
+    // foreach($system as $k => $v){
+    //     $_SESSION['system'][$k] = $v;
+    // }
 }
 ob_end_flush();
 ?>
 
 <head>
-	<meta charset="utf-8">
-	<meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-	<title>LifeLine Fitness</title>
-<link rel="stylesheet" href="./assets/css/login.css">
-
-	<?php include('./header.php'); ?>
-	<?php
-	if (isset($_SESSION['login_id']))
-		header("location:index.php?page=home");
-
-	?>
+    <title>LifeLine Fitness</title>
 	
+    <?php include('./header.php'); ?>
+    <?php
+    if (isset($_SESSION['login_id']))
+	header("location:index.php?page=home");
+?>
+	<link rel="stylesheet" href="./login.css">
 </head>
 
-
-<body style="
-    width: 341px;
-    height: 500px;
-    margin-left: 600px;
-	margin-top: 180px;
-">
-
-
-<div class="container" style="
-    MARGIN-LEFT: -504PX;
-    MARGIN-TOP: 469PX;
-">
-    <div class="form">
-      <h3 style="
-    COLOR: YELLOW;
-"class="title">Lifeline Fitness</h3>
-      <form id="login-form">
-        <div class="form-group">
-          <input type="text" name="username" required/><label>Username</label>
+<body class="login-body">
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-logo">
+          <i class="fas fa-dumbbell"></i>
         </div>
+        <h2 class="login-title">Lifeline Fitness</h2>
+        <p class="login-subtitle">Welcome back! Please sign in to your account.</p>
+      </div>
+      
+      <form id="login-form" class="login-form">
         <div class="form-group">
-          <input type="password" name="password" id="password" required/><label>Password</label>
+          <div class="input-group">
+            <i class="fas fa-user input-icon"></i>
+            <input type="text" name="username" class="form-control" placeholder="Username" required>
+          </div>
         </div>
-        <input STYLE="COLOR:BLACK;" type="submit" value="submit" class="submit"> 
         
+        <div class="form-group">
+          <div class="input-group">
+            <i class="fas fa-lock input-icon"></i>
+            <input type="password" name="password" id="password" class="form-control" placeholder="Password" required>
+          </div>
+        </div>
+        
+        <button type="submit" class="login-btn">
+          <span class="btn-text">Sign In</span>
+          <i class="fas fa-arrow-right btn-icon"></i>
+        </button>
       </form>
     </div>
-    
   </div>
 
 	<a href="#" class="back-to-top"><i class="icofont-simple-up"></i></a>
-
 
 </body>
 <script>
 	$('#login-form').submit(function(e) {
 		e.preventDefault()
-		$('#login-form button[type="button"]').attr('disabled', true).html('Logging in...');
+		const $btn = $(this).find('button[type="submit"]');
+		const $btnText = $btn.find('.btn-text');
+		const $btnIcon = $btn.find('.btn-icon');
+		
+		// Set loading state
+		$btn.addClass('loading').attr('disabled', true);
+		$btnText.text('Signing in...');
+		$btnIcon.removeClass('fa-arrow-right').addClass('fa-spinner fa-spin');
+		
 		if ($(this).find('.alert-danger').length > 0)
 			$(this).find('.alert-danger').remove();
+			
 		$.ajax({
 			url: 'ajax.php?action=login',
 			method: 'POST',
 			data: $(this).serialize(),
 			error: err => {
 				console.log(err)
-				$('#login-form button[type="button"]').removeAttr('disabled').html('Login');
-
+				// Reset button state
+				$btn.removeClass('loading').removeAttr('disabled');
+				$btnText.text('Sign In');
+				$btnIcon.removeClass('fa-spinner fa-spin').addClass('fa-arrow-right');
 			},
 			success: function(resp) {
 				if (resp == 1) {
-					location.href = 'index.php?page=home';
+					// Success - redirect
+					$btnText.text('Success!');
+					$btnIcon.removeClass('fa-spinner fa-spin').addClass('fa-check');
+					setTimeout(() => {
+						location.href = 'index.php?page=home';
+					}, 500);
 				} else {
+					// Error - reset button and show error
+					$btn.removeClass('loading').removeAttr('disabled');
+					$btnText.text('Sign In');
+					$btnIcon.removeClass('fa-spinner fa-spin').addClass('fa-arrow-right');
 					$('#login-form').prepend('<div class="alert alert-danger">Username or password is incorrect.</div>')
-					$('#login-form button[type="button"]').removeAttr('disabled').html('Login');
 				}
 			}
 		})

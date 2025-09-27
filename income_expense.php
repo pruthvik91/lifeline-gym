@@ -56,6 +56,11 @@
             <form id="entryForm">
                 <div class="form-row">
                     <div class="form-group col-md-4">
+                        <label>Date</label>
+                        <input type="date" class="form-control" id="created_at" required>
+                    </div>
+
+                    <div class="form-group col-md-4">
                         <label>Type</label>
                         <select class="form-control" id="type" required>
                             <option value="income">Income</option>
@@ -101,6 +106,8 @@
         let data = [];
 
         $(document).ready(function() {
+            $('#created_at').val(new Date().toISOString().slice(0, 10));
+
             table = $('#recordsTable').DataTable();
             fetchData();
             const editModal = new bootstrap.Modal(document.getElementById('editModal'));
@@ -110,6 +117,7 @@
                 const type = $('#type').val();
                 const amount = $('#amount').val();
                 const description = $('#description').val();
+                const created_at = $('#created_at').val();
 
                 $.ajax({
                     url: 'ajaxcall.php',
@@ -118,7 +126,8 @@
                         action: 'add',
                         type,
                         amount,
-                        description
+                        description,
+                        created_at
                     },
                     success: function(res) {
                         res = JSON.parse(res);
@@ -169,6 +178,7 @@
                 const id = $('#editId').val();
                 const amount = $('#editAmount').val();
                 const description = $('#editDescription').val();
+                const created_at = $('#created_at').val();
 
                 $.ajax({
                     url: 'ajaxcall.php',
@@ -177,7 +187,8 @@
                         action: 'update',
                         id,
                         amount,
-                        description
+                        description,
+                        created_at
                     },
                     success: function(res) {
                         res = JSON.parse(res);

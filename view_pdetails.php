@@ -17,9 +17,9 @@ if (isset($_GET['id'])) {
     <hr class="divider">
 
 </div>
-<div class="modal-footer display">
+<div class="modal-footer display p-0">
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-12 p-0">
             <button class="btn float-right btn-secondary" type="button" data-dismiss="modal">Close</button>
             <button class="btn float-right btn-primary mr-2" type="button" id="payment">Payment</button>
             <?php if (strtotime(date('Y-m-d')) >= strtotime($end_date)) : ?>
@@ -30,11 +30,16 @@ if (isset($_GET['id'])) {
         </div>
     </div>
 </div>
+
+
 <style>
 p {
     margin: unset;
 }
+#uni_modal .modal-body{
+    padding:0 !important;
 
+}
 #uni_modal .modal-footer {
     display: none;
 }
@@ -49,23 +54,28 @@ $('#payment').click(function() {
     uni_modal('Payments', 'payment.php?rid=<?php echo $id ?>', 'large')
 })
 $('#renew').click(function() {
-    start_load()
-    $.ajax({
-        url: 'ajax.php?action=renew_membership',
-        method: 'POST',
-        data: {
-            rid: '<?php echo $id ?>'
-        },
-        success: function(resp) {
-            if (resp > 0) {
-                alert_toast('Membership Successfully renewed', 'success')
-                end_load()
-                uni_modal("<i class='fa fa-address-card'></i> Member Plan Details",
-                    "view_pdetails.php?id=" + resp, '')
-            }
-        }
-    })
-})
+    uni_modal('Renew Membership', 'renew_plan.php?rid=<?php echo $id ?>', 'small');
+});
+
+
+// $('#renew').click(function() {
+//     start_load()
+//     $.ajax({
+//         url: 'ajax.php?action=renew_membership',
+//         method: 'POST',
+//         data: {
+//             rid: '<?php // echo $id ?>'
+//         },
+//         success: function(resp) {
+//             if (resp > 0) {
+//                 alert_toast('Membership Successfully renewed', 'success')
+//                 end_load()
+//                 uni_modal("<i class='fa fa-address-card'></i> Member Plan Details",
+//                     "view_pdetails.php?id=" + resp, '')
+//             }
+//         }
+//     })
+// })
 $('#end').click(function() {
     start_load();
     $.ajax({

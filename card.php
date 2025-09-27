@@ -27,7 +27,7 @@ if (isset($_GET['id'])) {
 
     <div class="item">
 
-        <div class="card">
+        <div class="card" style="height:250px ">
             <div id="printable-area" class="item">
                 <figure class="front" style="
     height: 222px;

@@ -14,8 +14,14 @@ if ($wa_rowcount > 0) {
   }
 }
 
-
 ?>
+<style>
+	body:not(.has-navbar) main#view-panel {
+    margin-top: 8rem;
+    padding-top: 2rem;
+}
+	</style>
+
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-12 text-center">
@@ -26,14 +32,23 @@ if ($wa_rowcount > 0) {
     <div class="row">
         <div class="card col-lg-12">
             <div class="card-body">
-                <div id="qrCode" style="display: none;">
-                    <img id="qrImage" src="" alt="QR Code"/>
-                    <input type="hidden" id="wa_token" <?php echo (isset($wa_token) && !empty($wa_token))?'value="'.$wa_token.'"':'' ?> />
-                    <p class="note">Scan the QR from your phone WhatsApp to authenticate</p>
-                </div>
-                <div class="text-center">
-                    <button class="btn btn-primary" id="get_whatsapp_qr">Login to WhatsApp</button>
-                </div>
+            <div id="qrCode" style="display: none;">
+    <img id="qrImage" src="" alt="QR Code"/>
+    <input type="hidden" id="wa_token" <?php echo (isset($wa_token) && !empty($wa_token))?'value="'.$wa_token.'"':'' ?> />
+    <p class="note">Scan the QR from your phone WhatsApp to authenticate</p>
+</div>
+
+<div class="text-center" id="whatsapp_qr_btn">
+    <?php if (!empty($wa_token)) { ?>
+        <!-- If token already exists, show logout directly -->
+        <button type="button" class="btn btn-primary" id="whatsapp_logout">Disconnect</button>
+        <p class="note">Connected with <?php echo $contact_number; ?></p>
+    <?php } else { ?>
+        <!-- Otherwise show login button -->
+        <button class="btn btn-primary" id="get_whatsapp_qr">Login to WhatsApp</button>
+    <?php } ?>
+</div>
+
             </div>
         </div>
     </div>
@@ -68,7 +83,7 @@ if ($wa_rowcount > 0) {
                 const socket = io('localhost:3000');
                 console.log(socket);
                 let connectionAttempts = 0;
-                const maxRetries = 3;
+                const maxRetries = 10;
                 socket.on('connect', function() {
                     console.log('Connected to the Socket');
                 });
@@ -132,10 +147,11 @@ if ($wa_rowcount > 0) {
                     
                 });
 
+
                 socket.on('qrCode', function(data) {
                     if (data.qr) {
                         $('#qrImage').attr('src', `data:image/png;base64,${data.qr}`);
-                        $('#qrCode').slideDown();
+        $('#qrCode').slideDown();
                         setTimeout(function() {
                             $('#qrCode').slideUp();
                             if ($('#whatsapp_logout').length === 0) {

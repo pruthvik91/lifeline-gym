@@ -1,6 +1,9 @@
 <?php include 'db_connect.php' ?>
 <style>
-   
+body:not(.has-navbar) main#view-panel {
+  margin-top: 5rem;
+  padding-top: 2rem;
+}   
    span.float-right.summary_icon {
     font-size: 3rem;
     position: absolute;
@@ -38,87 +41,134 @@
 	}
 </style>
 
-<div class="containe-fluid">
-	<div class="row mt-3 ml-3 mr-3">
+<div class="container-fluid">
+	<div class="row">
         <div class="col-lg-12">
-            <div class="card">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-tachometer-alt me-2"></i>
+                        Welcome back, <?php echo $_SESSION['login_name']."!"  ?>
+                    </h4>
+                </div>
                 <div class="card-body">
-                    <?php echo "Welcome back ". $_SESSION['login_name']."!"  ?>
-                    <hr>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="card">
-                                <div class="card-body bg-primary">
-                                    <div class="card-body text-white">
-                                        <span class="float-right summary_icon"><i class="fa fa-users"></i></span>
-                                        <h4><b>
-                                            <?php echo $conn->query("SELECT * FROM registration_info where status = 1")->num_rows; ?>
-                                        </b></h4>
-                                        <p><b>Active Members</b></p>
+                    <div class="row g-4">
+                        <div class="col-md-4  mb-4">
+                            <div class="card bg-gradient-primary text-white h-100">
+                                <div class="card-body d-flex flex-column">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div>
+                                            <h3 class="mb-0 fw-bold">
+                                                <?php echo $conn->query("SELECT * FROM registration_info where status = 1")->num_rows; ?>
+                                            </h3>
+                                            <p class="mb-0 opacity-75">Active Members</p>
+                                        </div>
+                                        <div class="summary_icon">
+                                            <i class="fas fa-users"></i>
+                                        </div>
+                                    </div>
+                                    <div class="mt-auto">
+                                        <small class="opacity-75">Currently active memberships</small>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="card">
-                                <div class="card-body bg-info">
-                                    <div class="card-body text-white">
-                                        <span class="float-right summary_icon"><i class="fa fa-th-list"></i></span>
-                                        <h4><b>
-                                            <?php echo $conn->query("SELECT * FROM plans")->num_rows; ?>
-                                        </b></h4>
-                                        <p><b>Total Membership Plans</b></p>
+                        <div class="col-md-4  mb-4">
+                            <div class="card bg-gradient-info text-white h-100">
+                                <div class="card-body d-flex flex-column">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div>
+                                            <h3 class="mb-0 fw-bold">
+                                                <?php echo $conn->query("SELECT * FROM plans")->num_rows; ?>
+                                            </h3>
+                                            <p class="mb-0 opacity-75">Membership Plans</p>
+                                        </div>
+                                        <div class="summary_icon">
+                                            <i class="fas fa-clipboard-list"></i>
+                                        </div>
+                                    </div>
+                                    <div class="mt-auto">
+                                        <small class="opacity-75">Available membership options</small>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="card">
-                                <div class="card-body bg-warning">
-                                    <div class="card-body text-white">
-                                        <span class="float-right summary_icon"><i class="fa fa-list"></i></span>
-                                        <h4><b>
-                                            <?php echo $conn->query("SELECT * FROM packages")->num_rows; ?>
-                                        </b></h4>
-                                        <p><b>Total Packages</b></p>
+                        <div class="col-md-4  mb-4">
+                            <div class="card bg-gradient-warning text-white h-100">
+                                <div class="card-body d-flex flex-column">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div>
+                                            <h3 class="mb-0 fw-bold">
+                                                <?php echo $conn->query("SELECT * FROM packages")->num_rows; ?>
+                                            </h3>
+                                            <p class="mb-0 opacity-75">Total Packages</p>
+                                        </div>
+                                        <div class="summary_icon">
+                                            <i class="fas fa-box"></i>
+                                        </div>
+                                    </div>
+                                    <div class="mt-auto">
+                                        <small class="opacity-75">Service packages available</small>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="card">
-                                <div class="card-body " style="background-color: lightcoral;">
-                                    <div class="card-body text-white">
-                                        <span class="float-right summary_icon"><i class="fa fa-clock"></i></span>
-                                        <h4><b>
-                                            <?php echo $conn->query("SELECT batch FROM members where batch = 'Morning'")->num_rows; ?>
-                                        </b></h4>
-                                        <p><b>Morning</b></p>
+                        <div class="col-md-4  mb-4">
+                            <div class="card bg-gradient-danger text-white h-100">
+                                <div class="card-body d-flex flex-column">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div>
+                                            <h3 class="mb-0 fw-bold">
+                                                <?php echo $conn->query("SELECT batch FROM members where batch = 'Morning'")->num_rows; ?>
+                                            </h3>
+                                            <p class="mb-0 opacity-75">Morning Batch</p>
+                                        </div>
+                                        <div class="summary_icon">
+                                            <i class="fas fa-sun"></i>
+                                        </div>
+                                    </div>
+                                    <div class="mt-auto">
+                                        <small class="opacity-75">Morning session members</small>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="card">
-                                <div class="card-body " style="background-color: lightsalmon;">
-                                    <div class="card-body text-white">
-                                        <span class="float-right summary_icon"><i class="fa fa-clock"></i></span>
-                                        <h4><b>
-                                            <?php echo $conn->query("SELECT batch FROM members where batch = 'Evening'")->num_rows; ?>
-                                        </b></h4>
-                                        <p><b>Evening</b></p>
+                        <div class="col-md-4  mb-4">
+                            <div class="card bg-gradient-success text-white h-100">
+                                <div class="card-body d-flex flex-column">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div>
+                                            <h3 class="mb-0 fw-bold">
+                                                <?php echo $conn->query("SELECT batch FROM members where batch = 'Evening'")->num_rows; ?>
+                                            </h3>
+                                            <p class="mb-0 opacity-75">Evening Batch</p>
+                                        </div>
+                                        <div class="summary_icon">
+                                            <i class="fas fa-moon"></i>
+                                        </div>
+                                    </div>
+                                    <div class="mt-auto">
+                                        <small class="opacity-75">Evening session members</small>
                                     </div>
                                 </div>
                             </div>
-                        </div><div class="col-md-4">
-                            <div class="card">
-                                <div class="card-body " style="background-color: lightskyblue;">
-                                    <div class="card-body text-white">
-                                        <span class="float-right summary_icon"><i class="fa fa-users"></i></span>
-                                        <h4><b>
-                                            <?php echo $conn->query("SELECT * FROM members ")->num_rows; ?>
-                                        </b></h4>
-                                        <p><b>Total Members</b></p>
+                        </div>
+                        <div class="col-md-4  mb-4">
+                            <div class="card bg-gradient-primary text-white h-100">
+                                <div class="card-body d-flex flex-column">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div>
+                                            <h3 class="mb-0 fw-bold">
+                                                <?php echo $conn->query("SELECT * FROM members ")->num_rows; ?>
+                                            </h3>
+                                            <p class="mb-0 opacity-75">Total Members</p>
+                                        </div>
+                                        <div class="summary_icon">
+                                            <i class="fas fa-user-friends"></i>
+                                        </div>
+                                    </div>
+                                    <div class="mt-auto">
+                                        <small class="opacity-75">All registered members</small>
                                     </div>
                                 </div>
                             </div>

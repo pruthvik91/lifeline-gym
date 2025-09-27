@@ -39,7 +39,7 @@ if ($wa_rowcount > 0) {
         </div>
         <div class="col-md-4 col-sm-12 text-center text-md-left">
 
-          <img src="assets/img/logo.png" alt="">
+          <img src="assets/img/logo.png" alt="" style="width: 210px;">
 
 
         </div>
@@ -211,7 +211,9 @@ $message = "Your gym membership ended. Don't miss out, renew today!";
 
                 <?php else : ?>
                   <B style="margin-top: 50px; font-size: 17px;">USE QR CODE FOR PAYMENT NOW!</B>
-                  <img src="./assets/img/lifeline.png" alt="">
+                  <img src="./assets/img/lifeline.png" alt="" style="max-width: 227px;
+    margin-left: 60px;
+    max-height: 150px;">
                 <?php endif; ?>
               <?php endif; ?>
             <?php endwhile; ?>
@@ -338,8 +340,13 @@ $message = "Your gym membership ended. Don't miss out, renew today!";
       socket.emit('send-media', {
         wa_token: wa_token,
         number: number,
+        user_id: <?php echo $_SESSION["login_id"]; ?>,
+        inv_id: invoice_id,
+        from_number: "receipt",
         message: message,
-        base64Data: base64PDF
+        base64Data: base64PDF,
+        mimeType: "image/jpeg",
+        filename: "receipt.jpg"
       });
       socket.on('messageStatus', function(data) {
         if (data.code == '200') {

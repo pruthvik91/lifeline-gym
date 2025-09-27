@@ -6,7 +6,8 @@ $conn = new mysqli("localhost", "root", "root", "gym_db");
 $start = $_POST['start'] ?? date('Y-m-01');
 $end = $_POST['end'] ?? date('Y-m-t');
 $selectedGroups = $_POST['groups'] ?? [];
-$searchKeyword = strtolower(trim($_POST['search'] ?? ''));
+$searchKeyword = strtolower(trim(preg_replace('/\s+/', ' ', $_POST['search'] ?? '')));
+
 
 // Fetch unique groups for dropdown
 $groupQuery = "
@@ -19,7 +20,8 @@ $groupOptions = [];
 while ($row = $groupResult->fetch_assoc()) {
     $groupOptions[] = $row['group_key'];
 }
-
+$groupOptions = array_map('trim', preg_split('/\r\n|\r|\n/', implode("\n", $groupOptions)));
+$groupOptions = array_values(array_unique($groupOptions));
 $grouped = [];
 $totalIncome = 0;
 $totalExpense = 0;
@@ -34,7 +36,9 @@ $sql1 = "SELECT id, 'expense' as type, amount, TRIM(LOWER(description)) AS group
 $result1 = $conn->query($sql1);
 while ($row = $result1->fetch_assoc()) {
     if (!empty($selectedGroups) && !in_array($row['group_key'], $selectedGroups)) continue;
-    if ($searchKeyword && strpos(strtolower($row['description']), $searchKeyword) === false) continue;
+    $normalizedDescription = strtolower(trim(preg_replace('/\s+/', ' ', $row['description'])));
+if ($searchKeyword && strpos($normalizedDescription, $searchKeyword) === false) continue;
+
 
     $grouped['expense'][$row['group_key']]['items'][] = $row;
     $grouped['expense'][$row['group_key']]['total'] = ($grouped['expense'][$row['group_key']]['total'] ?? 0) + $row['amount'];
