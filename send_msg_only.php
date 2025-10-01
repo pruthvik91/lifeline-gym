@@ -26,7 +26,7 @@ $member_query = $conn->query("
     INNER JOIN members m ON m.id = r.member_id 
     INNER JOIN plans p ON p.id = r.plan_id 
     INNER JOIN packages pp ON pp.id = r.package_id 
-    WHERE r.status = 1 
+    WHERE r.status = 1  AND contact != ''
     ORDER BY r.id DESC 
 ");
 
@@ -87,6 +87,7 @@ while ($row = $member_query->fetch_assoc()) {
 
 <script>
     $(document).ready(function() {
+        var contacts = <?php echo json_encode($contacts); ?>;
         // Toggle media section based on message type selection
         $('input[name="message_type"]').on('change', function() {
             if ($(this).val() === 'media') {
@@ -139,224 +140,82 @@ while ($row = $member_query->fetch_assoc()) {
         let messagesSent = 0;
         let totalContacts = 0;
 
-        $('#whatsapp_send').on('click', function() {
-            if (isSending) {
-                alert('Messages are already being sent. Please wait...');
-                return;
-            }
+        $('#whatsapp_send').on('click', async function() {
+            if (isSending) return alert('Messages are already being sent.');
 
             const message = $('#bulk_message').val().trim();
             const messageType = $('input[name="message_type"]:checked').val();
             const mediaFile = $('#media_file')[0].files[0];
 
-            // Validation
-            if (!message) {
-                alert('Please enter a message to send.');
-                return;
-            }
+            if (!message) return alert('Please enter a message.');
+            if (messageType === 'media' && !mediaFile) return alert('Please select a media file.');
 
-            if (messageType === 'media' && !mediaFile) {
-                alert('Please select a media file.');
-                return;
-            }
-
-            // Reset counters and set sending state
             isSending = true;
             messagesSent = 0;
-            totalContacts = 0;
-
-            // Disable the send button
+            totalContacts = contacts.length;
             $('#whatsapp_send').prop('disabled', true).text('Sending...');
-
             const socket = io('http://localhost:3000');
-            let connectionAttempts = 0;
-            const maxRetries = 3;
-
             const wa_token = '<?php echo $wa_token; ?>';
-            var contacts = <?php echo json_encode($contacts); ?>;
-            console.log(contacts);
+            const batchId = 'bulk_' + Date.now();
+            let numbers = contacts.map(contact => createWhatsappPhone(contact));
+            if (messageType === 'media') {
+                // Convert media only once
+                const base64Data = await fileToBase64(mediaFile);
+                const mimeType = getMimeType(mediaFile.name);
+                const filename = mediaFile.name;
 
-            // Generate unique batch ID to prevent duplicates
-            const batchId = 'bulk_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                let base64DataArray = Array(numbers.length).fill(base64Data);
+                let mimeTypeArray = Array(numbers.length).fill(mimeType);
+                let filenameArray = Array(numbers.length).fill(filename);
 
-            // Set a timeout to prevent hanging
-            const sendTimeout = setTimeout(() => {
-                if (isSending) {
-                    console.log('Send timeout reached, resetting state');
-                    isSending = false;
-                    socket.disconnect();
-                    alert('Send operation timed out. Please try again.');
-                    // Refresh the page after timeout
-                    window.location.reload();
-                }
-            }, 60000); // 60 seconds timeout
+                // Emit bulk media
+                socket.emit('send-bulk-media', {
+                    wa_token,
+                    user_id: <?php echo $_SESSION["login_id"]; ?>,
+                    numbers,
+                    message,
+                    base64DataArray,
+                    mimeTypeArray,
+                    filenameArray
+                });
 
-            socket.on('connect', async function() {
-                console.log('Connected to the Socket server.');
-                totalContacts = contacts.length;
-                
-                for (const contact of contacts) {
-                    const formattedContact = createWhatsappPhone(contact);
-                    if (!formattedContact) {
-                        console.error('Invalid contact number:', contact);
-                        continue;
-                    }
-
-                    try {
-                        if (messageType === 'media' && mediaFile) {
-                            // Send media with message
-                            const base64Data = await fileToBase64(mediaFile);
-                            const mimeType = getMimeType(mediaFile.name);
-                            
-                            socket.emit('send-media', {
-                                wa_token: wa_token,
-                                user_id: <?php echo $_SESSION["login_id"]; ?>,
-                                inv_id: batchId + '_' + formattedContact,
-                                from_number: 'bulk_sender',
-                                number: formattedContact,
-                                message: message,
-                                base64Data: base64Data,
-                                mimeType: mimeType,
-                                filename: mediaFile.name
-                            });
-                        } else {
-                            // Send text message only
-                            socket.emit('send-message', {
-                                wa_token: wa_token,
-                                user_id: <?php echo $_SESSION["login_id"]; ?>,
-                                inv_id: batchId + '_' + formattedContact,
-                                from_number: 'bulk_sender',
-                                number: formattedContact,
-                                message: message
-                            });
-                        }
-                    } catch (error) {
-                        console.error('Error processing contact:', contact, error);
-                    }
-                }
-            });
-            socket.on('connect_error', function(error) {
-                connectionAttempts++;
-                if (connectionAttempts >= maxRetries) {
-                    console.error('Max connection attempts reached. Stopping Socket.');
-                    clearTimeout(sendTimeout);
-                    isSending = false;
-                    socket.disconnect();
-                    alert('Server disconnected. Please try again later.');
-                    // Refresh the page after connection error
-                    window.location.reload();
-                }
-            });
-
-            socket.on('messageStatus', function(response) {
-                console.log('Message sent successfully:', response);
-                messagesSent++;
-                
-                // Update UI with progress
-                $('#whatsapp_send').text(`Sending... (${messagesSent}/${totalContacts})`);
-                
-                // Check if all messages are sent
-                if (messagesSent >= totalContacts) {
-                    clearTimeout(sendTimeout);
-                    isSending = false;
-                    socket.disconnect();
-                    alert('All messages sent successfully!');
-                    // Refresh the page after successful send
-                    window.location.reload();
-                }
-            });
-
-            socket.on('error', function(error) {
-                console.error('Error sending message:', error);
-                clearTimeout(sendTimeout);
-                isSending = false;
-                socket.disconnect();
-                alert('Error: ' + error.message);
-                // Refresh the page after error
-                window.location.reload();
-            });
-
-            socket.on('userLogout', function(userLogout) {
-                if (userLogout.code === 401) {
-                    console.error('WhatsApp session expired.');
-                    clearTimeout(sendTimeout);
-                    isSending = false;
-                    socket.disconnect();
-                    alert('WhatsApp session expired. Please log in again.');
-                    // Refresh the page after logout
-                    window.location.reload();
-                } else {
-                    console.error(userLogout.message);
-                    clearTimeout(sendTimeout);
-                    isSending = false;
-                    socket.disconnect();
-                    alert('Error: ' + userLogout.message);
-                    // Refresh the page after error
-                    window.location.reload();
-                }
-            });
-
-            // Handle page unload to prevent duplicate sends
-            $(window).on('beforeunload', function() {
-                if (isSending) {
-                    socket.disconnect();
-                }
-            });
-
-            function authenticateWhatsappSession(token) {
-                $.ajax({
-                    type: "POST",
-                    url: "ajaxcall.php",
-                    dataType: 'json',
-                    data: {
-                        action: 'authenticateWhatsappSession',
-                        user_id: <?php echo $_SESSION["login_id"]; ?>,
-                        wa_token: token,
-                        status: 0
-                    },
-                    success: function(response) {
-                        if (response.status === 'OK') {
-                            alert('Please log in to WhatsApp again.');
-                        } else {
-                            console.error('Failed to authenticate WhatsApp session.');
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error during authentication:', error);
-                    }
+            } else {
+                // Emit bulk text message
+                socket.emit('send-bulk', {
+                    wa_token,
+                    user_id: <?php echo $_SESSION["login_id"]; ?>,
+                    numbers,
+                    message
                 });
             }
+
+            // Handle per-number progress (for both media and text)
+            socket.on('bulk-progress', function(data) {
+                $('#whatsapp_send').text(`Sending... (${messagesSent}/${totalContacts})`);
+            });
+            socket.on('bulk-media-progress', function(data) {
+                $('#whatsapp_send').text(`Sending... (${messagesSent}/${totalContacts})`);
+            });
+
+            socket.once('bulk-done', function() {
+                isSending = false;
+                $('#whatsapp_send').prop('disabled', false).text('Send');
+                alert('All messages processed!');
+            });
+            socket.once('bulk-media-done', function() {
+                isSending = false;
+                $('#whatsapp_send').prop('disabled', false).text('Send');
+                alert('All messages processed!');
+            });
         });
+
+
     });
+
     function createWhatsappPhone(number) {
-  if (typeof number !== 'string') {
-    number = String(number); // Ensure the input is a string
-  }
-
-  // Remove unwanted characters
-  number = number.replace(/[+/\s-]/g, "");
-
-  // Validate the number contains only digits
-  if (!/^\d+$/.test(number)) {
-    return false; // Invalid if non-numeric characters remain
-  }
-
-  // Ensure the number has a valid length
-  if (number.length < 10) {
-    return false; // Too short to be valid
-  }
-
-  // Handle specific formats
-  if (number.startsWith("91") && number.length === 12) {
-    return number; // Already in correct format
-  } else if (number.startsWith("0") && number.length === 11) {
-    return "91" + number.substring(1); // Convert "0XXXXXXXXX" to "91XXXXXXXXXX"
-  } else if (number.length === 10) {
-    return "91" + number; // Assume it's a local number without prefix
-  }
-
-  // Return the number as-is if it's valid but doesn't match specific cases
-  return number.length >= 12 ? number : false;
-}
-
+        number = String(number.trim()).replace(/\D/g, '');
+        if (number.length == 10) return "91" + number;
+        if (number.length == 11 && number.startsWith('0')) return "91" + number.substring(1);
+        return number;
+    }
 </script>
