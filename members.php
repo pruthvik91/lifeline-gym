@@ -129,7 +129,7 @@
         uni_modal("<i class='fa fa-plus'></i> New Member", "manage_member.php", 'mid-large')
     })
     $('.view__member').click(function() {
-        uni_modal("<i class='fa fa-id-card'></i> Member Details", "view_member.php?id=" + $(this).attr('data-id'),
+        uni_modal("<i class='fa fa-id-card'></i> Member Details", "view_member_detail.php?id=" + $(this).attr('data-id'),
             'large')
 
     })

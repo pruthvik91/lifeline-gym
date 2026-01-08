@@ -380,6 +380,11 @@ class Action
 				// $data .= ", batch_id ='$batch_id' ";
 
 				$data .= ", start_date ='" . $start_date . "' ";
+                if ($_FILES['img']['tmp_name'] != '') {
+					$fname = strtotime(date('y-m-d H:i')) . '_' . $_FILES['img']['name'];
+					$move = move_uploaded_file($_FILES['img']['tmp_name'], 'assets/uploads/' . $fname);
+					$data .= ", profile_pic = '$fname' ";
+				}
 				$plan = $this->db->query("SELECT * FROM plans where id = $plan_id")->fetch_array()['plan'];
 
 				$data .= ", end_date ='" . date("Y-m-d", strtotime($start_date . ' +' . $plan . ' months')) . "' ";
@@ -394,6 +399,11 @@ class Action
 					return 2;
 					exit;
 				}
+			}
+            if ($_FILES['img']['tmp_name'] != '') {
+				$fname = strtotime(date('y-m-d H:i')) . '_' . $_FILES['img']['name'];
+				$move = move_uploaded_file($_FILES['img']['tmp_name'], 'assets/uploads/' . $fname);
+				$data .= ", profile_pic = '$fname' ";
 			}
 			$save = $this->db->query("UPDATE members set $data where id=" . $id);
 		}
