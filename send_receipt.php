@@ -6,532 +6,367 @@ global $pdoconn;
 $wa_result = $pdoconn->prepare("SELECT wa_token,contact_number FROM whatsapp_token where user_id =:user_id AND status=1");
 $wa_result->execute(array(':user_id' => $_SESSION['login_id']));
 $wa_rows = $wa_result->fetchAll(PDO::FETCH_OBJ);
-$wa_rowcount = count($wa_rows);
-if ($wa_rowcount > 0) {
-  foreach ($wa_rows as $wa_row) {
-    $wa_token = $wa_row->wa_token;
-    $contact_number = $wa_row->contact_number;
-  }
-} 
-$id = $_GET['id'] ?? null; // Member ID
-$wp = $_GET['wp'] ?? null; // Action, should be 'send'
-if (!empty($id) && $wp === 'send') {
+if (count($wa_rows) > 0) {
+  $wa_token = $wa_rows[0]->wa_token;
+}
+
+$id = $_GET['id'] ?? null;
+if (!empty($id)) {
+    $qry = $conn->query("SELECT *,concat(firstname,' ',lastname,' ',middlename) as name FROM members where id=$id")->fetch_array();
+    foreach ($qry as $k => $v) {
+        $$k = $v;
+    }
+}
 ?>
-<meta content="" name="descriptison">
-<meta content="" name="keywords">
-
-
-
-<!-- Google Fonts -->
-<link
-    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
-    rel="stylesheet">
+<!-- Google Fonts & Font Awesome -->
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/font-awesome/css/all.min.css">
-
-
-<!-- Vendor CSS Files -->
 <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-<link href="assets/vendor/icofont/icofont.min.css" rel="stylesheet">
-<link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-<link href="assets/vendor/venobox/venobox.css" rel="stylesheet">
-<link href="assets/vendor/animate.css/animate.min.css" rel="stylesheet">
-<link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
-<link href="assets/vendor/owl.carousel/assets/owl.carousel.min.css" rel="stylesheet">
-<link href="assets/vendor/bootstrap-datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet">
-<link href="assets/DataTables/datatables.min.css" rel="stylesheet">
-<link href="assets/css/jquery.datetimepicker.min.css" rel="stylesheet">
-<link href="assets/fullcalendar/main.css" rel="stylesheet">
-<link href="assets/css/select2.min.css" rel="stylesheet">
 
-
-<!-- Template Main CSS File -->
-<link href="assets/css/style.css" rel="stylesheet">
-<link type="text/css" rel="stylesheet" href="assets/css/jquery-te-1.4.0.css">
-<!-- heh -->
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-te/1.4.0/jquery-te.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-te/1.4.0/jquery-te.css"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-te/1.4.0/jquery-te.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-te/1.4.0/jquery-te.min.css"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-te/1.4.0/jquery-te.png"></script>
-
-<script src="https://code.jquery.com/jquery.min.js" integrity="sha256-iauvHiRxsAUlsGlASOF5wPOaJnTjvLNEYOprxIAYgr4=" crossorigin="anonymous"></script>
-<script src="https://code.jquery.com/jquery-1.4.js" integrity="sha256-iCknuarbJQS1xqgjvYyMUW8h3sbkQf4sj6Io41lRvMg=" crossorigin="anonymous"></script> -->
-<script src="assets/vendor/jquery/jquery.min.js"></script> 
-<!-- heh -->
-<script src="assets/DataTables/datatables.min.js"></script>
-<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="assets/vendor/jquery.easing/jquery.easing.min.js"></script>
-<script src="assets/vendor/php-email-form/validate.js"></script>
-<script src="assets/vendor/venobox/venobox.min.js"></script>
-<script src="assets/vendor/waypoints/jquery.waypoints.min.js"></script>
-<script src="assets/vendor/counterup/counterup.min.js"></script>
-<script src="assets/vendor/owl.carousel/owl.carousel.min.js"></script>
-<script src="assets/vendor/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
-<script type="text/javascript" src="assets/js/select2.min.js"></script>
-<script type="text/javascript" src="assets/js/jquery.datetimepicker.full.min.js"></script>
-<script type="text/javascript" src="assets/font-awesome/js/all.min.js"></script>
 <style>
-  img {
-		max-width: 227px;
-		margin-left: 60px;
-		max-height: 150px;
-	}
+    #htmlContent {
+        background: white;
+        padding: 50px;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        color: #1e293b;
+        width: 800px;
+        margin: 0 auto;
+        min-height: 1123px;
+        box-shadow: 0 0 40px rgba(0,0,0,0.05);
+    }
+
+    .receipt-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 40px;
+        border-bottom: 2px solid #f1f5f9;
+        padding-bottom: 30px;
+    }
+
+    .receipt-brand h2 {
+        font-weight: 800;
+        letter-spacing: -1px;
+        color: #0f172a;
+        margin-bottom: 5px;
+        font-size: 1.5rem;
+    }
+
+    .receipt-brand p {
+        color: #64748b;
+        font-size: 0.85rem;
+        margin-bottom: 2px;
+        font-weight: 500;
+    }
+
+    .receipt-info {
+        text-align: right;
+    }
+
+    .receipt-info h1 {
+        font-weight: 900;
+        font-size: 2.5rem;
+        color: #e2e8f0;
+        margin-bottom: 0;
+        line-height: 1;
+    }
+
+    .receipt-info p {
+        font-weight: 700;
+        color: #6366f1;
+        margin-top: 5px;
+    }
+
+    .bill-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        margin-bottom: 40px;
+    }
+
+    .bill-to h6 {
+        text-transform: uppercase;
+        font-size: 0.7rem;
+        letter-spacing: 1px;
+        color: #94a3b8;
+        font-weight: 800;
+        margin-bottom: 15px;
+    }
+
+    .bill-to h4 {
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 8px;
+    }
+
+    .bill-to p {
+        font-size: 0.9rem;
+        color: #475569;
+        margin-bottom: 4px;
+        font-weight: 500;
+    }
+
+    .receipt-details table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 30px;
+    }
+
+    .receipt-details th {
+        text-align: left;
+        background: #f8fafc;
+        padding: 12px 15px;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #64748b;
+        font-weight: 800;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .receipt-details td {
+        padding: 15px;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #334155;
+    }
+
+    .payment-summary {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        padding: 25px;
+        border-radius: 16px;
+        margin-bottom: 40px;
+    }
+
+    .payment-summary.paid {
+        background: #f0fdf4;
+        border: 1px solid #dcfce7;
+    }
+
+    .payment-summary.pending {
+        background: #fdf2f8;
+        border: 1px solid #fce7f3;
+    }
+
+    .payment-badge-success {
+        display: inline-block;
+        background: #dcfce7;
+        color: #15803d;
+        padding: 4px 12px;
+        border-radius: 8px;
+        font-size: 0.7rem;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        margin-bottom: 10px;
+    }
+
+    .payment-badge-danger {
+        display: inline-block;
+        background: #fee2e2;
+        color: #b91c1c;
+        padding: 4px 12px;
+        border-radius: 8px;
+        font-size: 0.7rem;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        margin-bottom: 10px;
+    }
+
+    .qr-section {
+        text-align: center;
+    }
+
+    .qr-section img {
+        width: 120px;
+        height: 120px;
+        margin-bottom: 8px;
+        border: 4px solid white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    }
+
+    .qr-section p {
+        font-size: 0.65rem;
+        font-weight: 800;
+        color: #1e293b;
+        text-transform: uppercase;
+    }
+
+    .rules-section {
+        border-top: 2px dashed #e2e8f0;
+        padding-top: 30px;
+    }
+
+    .rules-section h5 {
+        font-weight: 800;
+        font-size: 0.9rem;
+        color: #0f172a;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .rules-list {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px 30px;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .rules-list li {
+        font-size: 0.75rem;
+        color: #64748b;
+        font-weight: 500;
+        line-height: 1.4;
+        position: relative;
+        padding-left: 15px;
+    }
+
+    .rules-list li::before {
+        content: '•';
+        position: absolute;
+        left: 0;
+        color: #6366f1;
+        font-weight: 900;
+    }
 </style>
-<!-- <script type="text/javascript" src="assets/js/jquery-te-1.4.0.min.js" charset="utf-8"></script> -->
-<div class="container" id="htmlContent">
 
-  <section class="card p-3">
-    <div class="card-body">
-      <!-- Invoice Company Details -->
-      <div id="invoice-company-details" class="row">
-        <div class="col-md-4 col-sm-12 text-center text-md-left">
-          <div class="media">
-
-
-
-
-            <div class="media-body ">
-              <ul class="ml-2 px-0 list-unstyled">
-                <li class="text-bold-800">LIFELINE FITNESS</li>
-                <li> J.T MALL , ABOVE HDFC BANK</li>
-                <li>AMBAVADI,KESHOD</li>
-                <li>Mo.9909568777</li>
-
-              </ul>
+<div id="htmlContent">
+    <!-- Receipt Header -->
+    <div class="receipt-header">
+        <div class="receipt-brand">
+            <img src="assets/img/logo.png" alt="Logo" style="width: 120px; margin-bottom: 15px;">
+            <h2>LIFELINE FITNESS</h2>
+            <p>J.T Mall, Above HDFC Bank</p>
+            <p>Ambavadi, Keshod</p>
+            <p><i class="fas fa-phone-alt me-1"></i> +91 99095 68777</p>
+        </div>
+        <div class="receipt-info">
+            <h1>RECEIPT</h1>
+            <p>#INV-<?php echo str_pad($id, 6, '0', STR_PAD_LEFT) ?></p>
+            <div class="mt-4">
+                <span style="color: #94a3b8; font-weight: 700; font-size: 0.8rem;">DATE:</span>
+                <span style="font-weight: 800; color: #1e293b;"><?php echo date("d M, Y") ?></span>
             </div>
-          </div>
-
         </div>
-        <div class="col-md-4 col-sm-12 text-center text-md-left">
+    </div>
 
-          <img src="assets/img/logo.png" alt="">
-
-
+    <!-- Bill Section -->
+    <div class="bill-section">
+        <div class="bill-to">
+            <h6>Billed To Member</h6>
+            <h4><?php echo ucwords($name) ?></h4>
+            <p><i class="fas fa-id-card me-2 opacity-50"></i> Member ID: <b><?php echo $id ?></b></p>
+            <p><i class="fas fa-phone me-2 opacity-50"></i> <?php echo $contact ?></p>
+            <p><i class="fas fa-map-marker-alt me-2 opacity-50"></i> <?php echo $address ?></p>
+            <p><i class="fas fa-clock me-2 opacity-50"></i> Training Batch: <b><?php echo $batch ?></b></p>
         </div>
+        <div class="text-end d-flex flex-column justify-content-end align-items-end">
+            <div class="p-3 bg-light rounded-3 border" style="width: fit-content;">
+                <p class="small text-muted fw-700 mb-1 text-uppercase">Payment Method</p>
+                <p class="fw-800 text-dark mb-0"><i class="fas fa-wallet me-2 text-primary"></i> Digital Payment / Cash</p>
+            </div>
+        </div>
+    </div>
 
-        <div class="col-md-4 col-sm-12 text-center text-md-right">
-          <h2>INVOICE</h2>
-          <p class="pb-3"># INV-001001</p>
-
-        </div>
-      </div>
-      <!--/ Invoice Company Details -->
-      <!-- Invoice Customer Details -->
-      <div id="invoice-customer-details" class="row pt-2">
-        <div class="col-sm-12 text-center text-md-left">
-          <p class="text-muted">Bill To</p>
-        </div>
-        <?php include 'db_connect.php' ?>
-        <?php
-        if (isset($_GET['id'])) {
-          $qry = $conn->query("SELECT *,concat(lastname,' ',firstname,' ',middlename) as name FROM members where id=" . $_GET['id'])->fetch_array();
-          foreach ($qry as $k => $v) {
-            $$k = $v;
-          }
-        }
-
-        ?>
-        <div class="col-md-6 col-sm-12 text-center text-md-left">
-          <ul class="px-0 list-unstyled">
-            <li><b>ID:<?php echo ucwords($id) ?></b></li>
-            <li class="text-bold-800"> <b><?php echo ucwords($name) ?></b></li>
-            <li><b><?php echo ucwords($contact) ?></b></li>
-            <input type="hidden" name="mobile_number" value="<?php echo $contact; ?>">
-            <input type="hidden" name="user_name" value="<?php echo $name; ?>">
-            <input type="hidden" name="invoice_id" value="<?php echo $id; ?>">
-            <li><b><?php echo $address ?></b></li>
-            <li>
-              <p>Batch :</i> <b><?php echo $batch ?></b></p>
-            </li>
-          </ul>
-        </div>
-        <div class="col-md-6 col-sm-12 text-center text-md-right">
-          <p>
-            <span class="text-muted">Invoice Date :</span> <?php echo date("d/m/Y") ?>
-          </p>
-          <!-- <p>
-            <span class="text-muted">Terms :</span> Due on Receipt
-          </p>
-          <p>
-            <span class="text-muted">Due Date :</span> 10/05/2016
-          </p> -->
-        </div>
-      </div>
-      <!--/ Invoice Customer Details -->
-      <!-- Invoice Items Details -->
-      <div id="invoice-items-details" class="pt-2">
-        <div class="row">
-          <div class="table-responsive col-sm-12">
-            <table class="table">
-              <thead>
+    <!-- Items Table -->
+    <div class="receipt-details">
+        <table>
+            <thead>
                 <tr>
-
-                  <th>Plan </th>
-                  <th> Package</th>
-                  <th class="text-left">start date</th>
-                  <th class="text-left">End date</th>
-                  <th class="text-left">status</th>
+                    <th>Membership Plan</th>
+                    <th>Service Package</th>
+                    <th>Start Date</th>
+                    <th>Expiry Date</th>
+                    <th class="text-end">Status</th>
                 </tr>
-              </thead>
-              <tbody>
+            </thead>
+            <tbody>
                 <?php
-                $pcount = 0;
-                $paid = $conn->query("SELECT r.*,pl.plan,pa.package FROM registration_info r inner join plans pl on pl.id = r.plan_id inner join packages pa on pa.id = r.package_id where r.member_id = $id order by id desc limit 1");
-                while ($row = $paid->fetch_assoc()) :
-                  $pcount++;
+                $paid_qry = $conn->query("SELECT r.*,pl.plan,pa.package FROM registration_info r inner join plans pl on pl.id = r.plan_id inner join packages pa on pa.id = r.package_id where r.member_id = $id order by id desc limit 1");
+                while ($row = $paid_qry->fetch_assoc()) :
+                $today = strtotime(date('Y-m-d'));
+                $expiry = strtotime($row['end_date']);
+                $is_expired = ($today > $expiry) || ($row['status'] == 0);
                 ?>
-                  <tr>
-
-                    <td>
-                      <p><?php echo $row['plan'] . ' months.' ?></p>
-
+                <tr>
+                    <td><b><?php echo $row['plan'] ?> Months</b> Subscription</td>
+                    <td><?php echo $row['package'] ?></td>
+                    <td><?php echo date("d M, Y", strtotime($row['start_date'])) ?></td>
+                    <td style="color: #e11d48;"><?php echo date("d M, Y", $expiry) ?></td>
+                    <td class="text-end">
+                        <?php if (!$is_expired) : ?>
+                            <span class="badge bg-success text-white px-2 py-1">Active</span>
+                        <?php else : ?>
+                            <span class="badge bg-danger text-white px-2 py-1">Expired</span>
+                        <?php endif; ?>
                     </td>
-                    <td class="text-left"><?php echo $row['package'] ?></td>
-                    <td class="text-left"><?php echo date("M d,Y", strtotime($row['start_date'])) ?></td>
-                    <td class="text-left" style="color: red; font-weight: 800;"><?php echo date("M d,Y", strtotime($row['end_date'])) ?></td>
-                    <td>
-                      <?php if ($row['status'] == 1) : ?>
-                        <?php
-                        $end_date = $row['end_date'];
-                        $days_remaining = ceil((strtotime($end_date) - time()) / (60 * 60 * 24));
-                        if ($days_remaining > 0) {
-                          $badge_class = $days_remaining <= 7 ? 'badge-danger' : 'badge-success';
-                          echo "<span class='badge $badge_class'>$days_remaining days remaining</span>";
-                        } else {
-                          echo "<span class='badge badge-danger'>Expired</span>";
-                        }
-                        ?>
-                      <?php elseif ($row['status'] == 2) : ?>
-                        <span class="badge badge-secondary">Closed</span>
-                      <?php endif; ?>
-                    </td>
-
-
-
-                  </tr>
+                </tr>
                 <?php endwhile; ?>
-              </tbody>
-            </table>
-          </div>
-        </div>
+            </tbody>
+        </table>
+    </div>
 
-        <div class="row">
-          <div class="col-md-6  text-center text-md-left">
-
-
-            <p class="lead"> <b> Payment </b> </p>
-
-
-
-            <div class="row">
-
-              <div class="col-md-8">
-                <table class="table table-borderless table-sm">
-                  <tbody>
-                    <?php
-                    $pcount = 0;
-                    $paid = $conn->query("SELECT r.*,pl.plan,pa.package FROM registration_info r inner join plans pl on pl.id = r.plan_id inner join packages pa on pa.id = r.package_id where r.member_id = $id order by id desc limit 1 ");
-                    while ($row = $paid->fetch_assoc()) :
-                      $pcount++;
-                      if (strtotime(date('Y-m-d')) <= strtotime($row['end_date'])) :
-                        $days_remaining = ceil((strtotime($row['end_date']) - strtotime(date('Y-m-d'))) / (60 * 60 * 24));
-                        if ($days_remaining > 5) :
-                          $sql = "SELECT * FROM payments  where member_id = $member_id order by id desc limit 1";
-                          $result = $conn->query($sql);
-                          if ($result->num_rows > 0) {
-                            // output data of each row
-                            while ($row = $result->fetch_assoc()) {
-                              echo "<h4>" . "PAID AMOUNT:" . "" . '<strong> ' . $row["amount"] . '</strong>' . "</h4>";
-                              echo "PAID VIA: " . $row["remarks"];
-                            }
-                          } else {
-                            echo  "<h2>FEES PENDING </h2>";
-                          }
-                        else :
-                          echo "<p>Dear member, Your membership plan will expire in <b>$days_remaining days</b>. Please renew it to avoid service interruption.</p>";
-                        endif;
-                      else :
-                        echo "<p>Dear member, Your membership plan has been <b>expired</b> please renew it for uninterrupted service.</p>";
-                      endif;
-                    endwhile;
-                    ?>
-
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6 col-sm-12 text-center text-md-right">
-
-            <?php
-            $pcount = 0;
-            $paid = $conn->query("SELECT r.*,pl.plan,pa.package FROM registration_info r inner join plans pl on pl.id = r.plan_id inner join packages pa on pa.id = r.package_id where r.member_id = $id order by id desc limit 1");
-            while ($row = $paid->fetch_assoc()) :
-              $pcount++;
-            ?>
-              <?php if ($row['status'] == 1) : ?>
-                <?php if (strtotime(date('Y-m-d')) <= strtotime($row['end_date'])) : ?>
-
-                <?php else : ?>
-                  <B style="margin-top: 50px; font-size: 17px;">USE QR CODE FOR PAYMENT NOW!</B>
-                  <img src="./assets/img/lifeline.png" alt="">
-                <?php endif; ?>
-              <?php endif; ?>
-            <?php endwhile; ?>
-
-          </div>
-
-
-
-          <!-- Invoice Footer -->
-          <div id="invoice-footer">
-            <div class="row">
-              <div class="col-md-12 col-sm-12">
-                <h6 style="margin-left:477px ;">Terms &amp; Condition</h6>
-                <p style="margin-left:239px ;">Please pay fees within two days of expiry date otherwise your <b style="color: red;"> card will not work.</b></p>
-                <b style="margin-left: 315px;font-size: 20px; background-color: yellow;">Your fees are non-refundable and non-transferable!!</b>
-
-              
-                <ul >
-        <b>LIFE LINE FITNESS RULES</b>
-        <li>GYM ના થોડા નિયમો, જે આપે પાલન કરવા ફરજીયાત છે</li>
-        <li>GYM ની અંદર આપે ટ્રેકશુટ અને બુટ પહેરવા ફરજીયાત છે. બુટ બેગમાં લઈને આવવા અથવા અહિંયા મુકીને જવા.</li>
-        <li>GYM ની અંદર કોઇ પણ વ્યક્તિ એ પાન-માવા ખાવાની સખ્ત મનાઈ છે.</li>
-        <li>Trainer તરફથી જે પણ Exercise નું કહેવામાં આવે એટલી જ Exercise કરવી. તમારી રીતે કોઇ પણ Exercise કરવામાં આવશે</li>
-        <li>તો તેની સંપૂર્ણ જવાબદારી તમારી રહેશે. સાધનો જેમકે Dumbbells - Barbells - Matt - Handles બધી જ કસરતો પૂરી થયા પછી તેમની નક્કી કરેલી જગ્યા પર મુકવા ફરજીયાત છે.</li>
-        <li>Barbell બનાવતી વખતે તેમાં ક્લિપ લગાવવી ફરજીયાત છે.</li>
-        <li>આપની ફી સમયસર જમા તેમજ રીન્યુ કરાવવી.</li>
-        <li>GYM ની અંદર ખરાબ શબ્દો તેમજ ગેરવ્યાજબી વર્તન કરવાની સખ્ત મનાઈ છે.</li>
-        <li>Treadmill નો વપરાશ ૧૦ મિનિટ પુરતો મર્યાદિત છે. એથી વધારે કરવું હોય તો ચાર્જ અલગથી આપવાનો રહેશે.</li>
-        <li>Treadmill થઈ ગયા પછી સ્વિચ બંધ કરવી.</li>
-        <li>આપે પાડેલી રજા ફી માંથી બાદ થશે નહિં.</li>
-        <li>GYM પુરી રીતે કેમેરાથી સુરક્ષિત છે.</li>
-        <li>GYM ના કોઈ પણ સભ્ય એ પોતાના મિત્રો ને સાથે બેસવા લઇ આવવા નહિં.</li>
-        <li>GYM માં કામ વગર બેસવાની સખ્ત મનાઇ છે.</li>
-        <li>ઉપર મુજબના બધા નિયમ પાળવા તમે સજ્જ હોવ તો જ GYM ની મેમ્બરશીપ લેવી</li>
-      </ul>
-              </div>
-
-            </div>
-          </div>
-          <!--/ Invoice Footer -->
-        </div>
-  </section>
-</div>
-<div class="invoice-footer">
-  <a id="download"  class="button" onclick="downloadInvoice()">Download</a>
-  <a id="whatsapp_send" class="button whatsapp_btn">Send Invoice</a>
-</div>
-<?php // At the beginning of send_receipt.php
-// Log incoming parameters
-echo json_encode(['status' => 'success', 'message' => 'Message sent successfully.']);
- ?>
-<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-<script src="assets/js/socket.io.min.js"></script>
-<script src="assets/js/sweetalert2.js"></script>
-
-<script type="text/javascript">
-  var Toast = Swal.mixin({
-    toast: true,
-    position: 'top-end',
-    showConfirmButton: false,
-    timer: 3000,
-    showClass: {
-      popup: 'animate__animated animate__slideInRight'
-    },
-    hideClass: {
-      popup: 'animate__animated animate__slideOutRight'
-    },
-    timerProgressBar: true,
-  });
-
-  function errorMessage(text, title = "Error", html = '', icon = 'warning') {
-    Swal.fire({
-      icon: icon,
-      title: '' + title + '',
-      text: text,
-      html: html,
-      allowEnterKey: false,
-      allowEscapeKey: false
-    });
-  }
-
-
-  function sendInvoice() {
-  var mobile_number = $("input[name='mobile_number']").val();
-  mobile_number = createWhatsappPhone(mobile_number);
-  const socket = io('localhost:3000');
-  let connectionAttempts = 0;
-  const maxRetries = 3;
-
-  socket.on('connect', function() {
-    console.log('Connected to the Socket');
-  });
-
-  socket.on('connect_error', function(error) {
-    connectionAttempts++;
-    if (connectionAttempts >= maxRetries) {
-      console.log('Max connection attempts reached. Stopping Socket.');
-      errorMessage('Please try again after some time.', 'Server Disconnected!', '', 'error');
-      $("#whatsapp_send").html('Send Message').prop('disabled', false);
-      socket.disconnect();
-      return; // Exit the function on error
+    <!-- Payment & QR Section -->
+    <?php
+    $reg = $conn->query("SELECT r.* FROM registration_info r where r.member_id = $id order by id desc limit 1 ")->fetch_assoc();
+    $is_expired = false;
+    if ($reg) {
+        $today = strtotime(date('Y-m-d'));
+        $expiry = strtotime($reg['end_date']);
+        $is_expired = ($today > $expiry) || ($reg['status'] == 0);
     }
-  });
-
-  html2canvas(document.getElementById('htmlContent')).then(function(canvas) {
-    const base64PDF = canvas.toDataURL('image/png');
-
-    const wa_token = '<?php echo $wa_token ?>';
-    const number = mobile_number;
-    const message = `Your gym membership ended. Don't miss out, renew today!`;
-    var invoice_id = $('[name="invoice_id"]').val();
-    var user_name = $('[name="user_name"]').val().trim();
-
-    socket.emit('send-media', {
-      wa_token: wa_token,
-      number: number,
-      message: message,
-      base64Data: base64PDF
-    });
-
-    socket.on('messageStatus', function(data) {
-        if (data.code == '200') {
-        Toast.fire({
-            icon: 'success',
-            title: 'Message sent successfully'
-        }).then((result) => {
-            // Notify the parent to remove the iframe
-            
-            var data = {
-                action: 'message_log',
-                user_id: <?php echo $_SESSION["login_id"]; ?>,
-                member_id: invoice_id,
-                to_number: number,
-                wa_token: wa_token,
-                status: 1
-            }
-            $.ajax({
-                type: "POST",
-                url: "ajaxcall.php",
-                ContentType: 'application/json',
-                dataType: 'json',
-                data: data,
-                success: function(data) {
-                    if (data.status == 'OK') {
-                        window.parent.removeIframe('iframe_'+invoice_id,'success');
-                    } else {
-
-                    }
-                },
-                error: function(data) {
-                },
-                complete: function(data) {
-                    // You can perform additional actions here if needed
+    ?>
+    <div class="payment-summary <?php echo $is_expired ? 'pending' : 'paid' ?>">
+        <div class="payment-status">
+            <?php if (!$is_expired) : 
+                $p_sql = "SELECT * FROM payments where member_id = $id order by id desc limit 1";
+                $p_res = $conn->query($p_sql);
+                if ($p_res->num_rows > 0) {
+                    $p_row = $p_res->fetch_assoc();
+                    echo "<div class='payment-badge-success'>FEES PAID</div>";
+                    echo "<h4 class='fw-800'>₹" . number_format($p_row["amount"]) . "</h4>";
+                    echo "<p class='mb-0 text-muted'>Received via " . $p_row["remarks"] . "</p>";
+                } else {
+                    echo "<div class='payment-badge-success'>FEES PAID</div>";
+                    echo "<h4 class='fw-800'>Payment Verified</h4><p class='mb-0 text-muted'>Subscription active</p>";
                 }
-            });
-        });
-      } else {
-        window.parent.removeIframe('iframe_'+invoice_id,'failed');
-        errorMessage('Message could not be sent. Please try again.', 'Error Sending Message', '', 'error');
-        $("#whatsapp_send").html('Send Message').prop('disabled', false);
-        socket.disconnect();
-        return; // Exit the function on error
-      }
-    });
+            else : ?>
+                <div class='payment-badge-danger'>FEES PENDING</div>
+                <h4 class='fw-800'>MEMBERSHIP EXPIRED</h4>
+                <p class='mb-0 text-muted'>Please renew your plan to continue services.</p>
+            <?php endif; ?>
+        </div>
+        <div class="qr-section">
+            <?php if ($is_expired) : ?>
+                <img src="./assets/img/lifeline.png" alt="QR">
+                <p>SCAN TO PAY NOW</p>
+            <?php else : ?>
+                <div class='text-center opacity-50'><i class='fas fa-check-circle fa-3x mb-2 text-success'></i><p class='extra-small fw-800 text-muted'>ACCOUNT SECURE</p></div>
+            <?php endif; ?>
+        </div>
+    </div>
 
-    socket.on('userLogout', function(userLogout) {
-      if (userLogout.code == 401) {
-        var data = {
-          action: 'authenticateWhatsappSession',
-          user_id: <?php echo $_SESSION["login_id"]; ?>,
-          wa_token: userLogout.wa_token,
-          status: 0
-        }
-        $.ajax({
-          type: "POST",
-          url: "ajaxcall.php",
-          ContentType: 'application/json',
-          dataType: 'json',
-          data: data,
-          success: function(data) {
-            if (data.status == 'OK') {
-              $("#WhatsappModal #btnSubmit").html('<i class="fa fa-paper-plane"></i>Share on whatsapp');
-              $("#WhatsappModal #btnSubmit").prop('disabled', false);
-              $('#WhatsappModal').modal('toggle');
-              errorMessage('Please Login With WhatsApp', 'Whatsapp is Logout', '', 'error');
-            } else {
-              errorMessage('Please try again!', 'Something went wrong', '', 'error');
-            }
-          },
-          error: function(data) {
-            errorMessage('AJAX request failed. Please try again.', 'AJAX Error', '', 'error');
-          },
-          complete: function(data) {
-            // You can perform additional actions here if needed
-          }
-        });
-
-      } else {
-        errorMessage(userLogout.message, 'Something went wrong', '', 'error');
-      }
-    });
-  }).catch(function(err) {
-    errorMessage('Could not generate invoice image. Please try again.', 'Error', '', 'error');
-    $("#whatsapp_send").html('Send Message').prop('disabled', false);
-  });
-}
-
-  function createWhatsappPhone(number) {
-    number = number.replace("+", "");
-    number = number.replace("/", "");
-    number = number.replace("/", "");
-    number = number.replace(" ", "");
-    number = number.replace(" ", "");
-    number = number.replace("-", "");
-    number = number.replace("-", "");
-    if (!(/^\d+$/.test(number))) {
-      return false;
-    } else if (/^\d+$/.test(number) && number.length < 10) {
-      return false;
-    } else if (number.startsWith("91") && number.length == 12) {
-      return number;
-    } else if (number.startsWith("0") && number.length == 11) {
-      number = number.substring(1);
-      return "91" + number;
-    } else if (/^\d+$/.test(number) && number.length == 10) {
-      return "91" + number;
-    } else if (/^\d+$/.test(number)) {
-      return number;
-    } else {
-      return false;
-    }
-  }
-</script>
-
-
-
-<script type="text/javascript">
-
-  function closeOpenModal() {
-    var openModals = document.querySelectorAll('.modal.show');
-    openModals.forEach(function(modal) {
-      $(modal).modal('hide');
-    });
-  }
-
-  document.addEventListener('keydown', function(event) {
-    if (event.keyCode === 27) {
-      closeOpenModal();
-    }
-  });
-</script><?php
-if(isset($_GET['wp']) && $_GET['wp']=='send')
-{?>
-<script>
-    sendInvoice();
-    </script>
-<?php }
-}
- ?>
-
+    <!-- Rules Section -->
+    <div class="rules-section">
+        <h5><i class="fas fa-shield-alt text-primary"></i> LIFE LINE FITNESS RULES & POLICIES</h5>
+        <ul class="rules-list">
+            <li>GYM માં ટ્રેકશુટ અને બુટ પહેરવા ફરજીયાત છે.</li>
+            <li>બુટ બહારથી પહેરીને આવવા નહિ, અલગથી સાથે લાવવા.</li>
+            <li>GYM ની અંદર પાન-માવા ખાવાની સખ્ત મનાઈ છે.</li>
+            <li>ટ્રેનરની સૂચના મુજબ જ કસરત કરવી.</li>
+            <li>સાધનો વાપર્યા બાદ તેની યોગ્ય જગ્યાએ મૂકવા.</li>
+            <li>ફી સમયસર જમા તેમજ રીન્યુ કરાવવી.</li>
+            <li>ખરાબ શબ્દો કે ગેરવ્યાજબી વર્તન પર સખત પ્રતિબંધ છે.</li>
+            <li>Treadmill નો વપરાશ ૧૦ મિનિટ સુધી મર્યાદિત છે.</li>
+            <li>રજા પાડેલી હશે તો તે ફી માંથી બાદ થશે નહિ.</li>
+            <li>ફી રીફંડેબલ કે ટ્રાન્સફરેબલ નથી.</li>
+        </ul>
+    </div>
+</div>

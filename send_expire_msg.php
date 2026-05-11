@@ -2,139 +2,147 @@
 include 'db_connect.php';
 $wa_token = '';
 global $pdoconn;
-$wa_result = $pdoconn->prepare("SELECT wa_token,contact_number FROM whatsapp_token where user_id =:user_id AND status=1");
+$wa_result = $pdoconn->prepare("SELECT wa_token,contact_number FROM whatsapp_token WHERE user_id =:user_id AND status=1");
 $wa_result->execute(array(':user_id' => $_SESSION['login_id']));
 $wa_rows = $wa_result->fetchAll(PDO::FETCH_OBJ);
-$wa_rowcount = count($wa_rows);
-if ($wa_rowcount > 0) {
-    foreach ($wa_rows as $wa_row) {
-        $wa_token = $wa_row->wa_token;
-        $contact_number = $wa_row->contact_number;
-    }
+if (count($wa_rows) > 0) {
+    $wa_token = $wa_rows[0]->wa_token;
 }
 ?>
-<div class="col-lg-12">
-    <div class="row mb-4 mt-4">
-        <div class="col-md-12">
-            <!-- Date Filter Form -->
-            <form method="POST" action="">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="start_date">Start Date:</label>
-                            <input type="text" id="start_date" name="start_date" placeholder="Select Start Date" class='start_date_picker form-control'
-                                value="<?php echo isset($_POST['start_date']) ? $_POST['start_date'] : date('Y-m-d'); ?>">
-                        </div>
+<div class="container-fluid py-4">
+    <!-- Premium Header -->
+    <div class="d-flex align-items-center justify-content-between mb-4 px-2">
+        <div>
+            <h2 class="fw-800 text-slate-900 mb-1">Expiration Manager</h2>
+            <p class="text-slate-500 fw-500 mb-0">Identify and notify members with upcoming or past expirations</p>
+        </div>
+        <div class="connection-status-pill <?php echo !empty($wa_token) ? 'status-online' : 'status-offline' ?>">
+            <i class="fas fa-circle me-2 small"></i>
+            <span><?php echo !empty($wa_token) ? 'WhatsApp Connected' : 'WhatsApp Disconnected' ?></span>
+        </div>
+    </div>
+
+    <!-- Filter Card -->
+    <div class="card border-0 shadow-premium rounded-4 mb-4 overflow-hidden">
+        <div class="card-body p-4">
+            <form method="POST" action="" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label fw-700 text-slate-600">Start Date</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-2 border-end-0 rounded-start-3"><i class="fas fa-calendar-alt text-indigo-500"></i></span>
+                        <input type="text" name="start_date" class='start_date_picker form-control border-2 rounded-end-3 py-2' 
+                            value="<?php echo isset($_POST['start_date']) ? $_POST['start_date'] : date('Y-m-d'); ?>">
                     </div>
-                    <div class="col-md-6">
-                        <label for="end_date">End Date:</label>
-                        <input type="text" id="end_date" name="end_date" placeholder="Select End Date" class='end_date_picker form-control'
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-700 text-slate-600">End Date</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-2 border-end-0 rounded-start-3"><i class="fas fa-calendar-check text-indigo-500"></i></span>
+                        <input type="text" name="end_date" class='end_date_picker form-control border-2 rounded-end-3 py-2' 
                             value="<?php echo isset($_POST['end_date']) ? $_POST['end_date'] : date('Y-m-d'); ?>">
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Search</button>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-indigo-premium w-100 py-2 rounded-3 fw-700">
+                        <i class="fas fa-search me-2"></i> Find Expiring Members
+                    </button>
+                </div>
+            </form>
         </div>
-
-    </form>
     </div>
-</div>
-<div class="row">
-    <!-- FORM Panel -->
 
-    <!-- Table Panel -->
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header">
-                <b>Send Message</b>
-                <span class="">
-                    <button class="btn btn-primary btn-block btn-sm col-sm-2 float-right" type="button" id="send_message">
-                        <svg style="
-    width: 20px;
-    height: 20px;
-    margin-bottom: 6px;
-     filter: brightness(0%) invert(100%);
-" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 510 512.459">
-                            <path fill="#111B21" d="M435.689 74.468C387.754 26.471 324 .025 256.071 0 116.098 0 2.18 113.906 2.131 253.916c-.024 44.758 11.677 88.445 33.898 126.946L0 512.459l134.617-35.311c37.087 20.238 78.85 30.891 121.345 30.903h.109c139.949 0 253.88-113.917 253.928-253.928.024-67.855-26.361-131.645-74.31-179.643v-.012zm-179.618 390.7h-.085c-37.868-.011-75.016-10.192-107.428-29.417l-7.707-4.577-79.886 20.953 21.32-77.889-5.017-7.987c-21.125-33.605-32.29-72.447-32.266-112.322.049-116.366 94.729-211.046 211.155-211.046 56.373.025 109.364 22.003 149.214 61.903 39.853 39.888 61.781 92.927 61.757 149.313-.05 116.377-94.728 211.058-211.057 211.058v.011zm115.768-158.067c-6.344-3.178-37.537-18.52-43.358-20.639-5.82-2.119-10.044-3.177-14.27 3.178-4.225 6.357-16.388 20.651-20.09 24.875-3.702 4.238-7.403 4.762-13.747 1.583-6.343-3.178-26.787-9.874-51.029-31.487-18.86-16.827-31.597-37.598-35.297-43.955-3.702-6.355-.39-9.789 2.775-12.943 2.849-2.848 6.344-7.414 9.522-11.116s4.225-6.355 6.343-10.581c2.12-4.238 1.06-7.937-.522-11.117-1.584-3.177-14.271-34.409-19.568-47.108-5.151-12.37-10.385-10.69-14.269-10.897-3.703-.183-7.927-.219-12.164-.219s-11.105 1.582-16.925 7.939c-5.82 6.354-22.209 21.709-22.209 52.927 0 31.22 22.733 61.405 25.911 65.642 3.177 4.237 44.745 68.318 108.389 95.812 15.135 6.538 26.957 10.446 36.175 13.368 15.196 4.834 29.027 4.153 39.96 2.52 12.19-1.825 37.54-15.353 42.824-30.172 5.283-14.818 5.283-27.529 3.701-30.172-1.582-2.641-5.819-4.237-12.163-7.414l.011-.024z" />
-                        </svg> Send To Selected</button>
-                </span>
+    <!-- Results Card -->
+    <div class="card border-0 shadow-premium rounded-4 overflow-hidden">
+        <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <h5 class="mb-0 fw-800 text-slate-800"><i class="fas fa-users me-2 text-indigo-600"></i>Matching Records</h5>
+            
+            <div class="d-flex align-items-center gap-3">
+                <!-- Mobile Select All -->
+                <div class="d-lg-none d-flex align-items-center bg-slate-50 px-3 py-2 rounded-3 border">
+                    <span class="extra-small fw-800 text-slate-500 me-2">ALL</span>
+                    <label class="custom-check-container mb-0" style="width: 20px; height: 20px;">
+                        <input type="checkbox" id="mobile_select_all">
+                        <span class="checkmark" style="width: 20px; height: 20px;"></span>
+                    </label>
+                </div>
+
+                <button class="btn btn-indigo-premium btn-sm rounded-pill px-4 fw-700" type="button" id="send_message">
+                    <i class="fas fa-paper-plane me-2"></i> Notify Selected
+                </button>
             </div>
-            <div class="card-body">
-
-                <table class="msg-table table table-bordered table-condensed table-hover">
-                    <colgroup>
-                        <col width="5%">
-                        <col width="15%">
-                        <col width="20%">
-                        <col width="20%">
-                        <col width="20%">
-                        <col width="20%">
-                        <col width="10%">
-                    </colgroup>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table align-middle mb-0" id="expire-table">
                     <thead>
                         <tr>
-                            <th class="text-center"><input type="checkbox" id="select_all" style="transform: scale(1.5); /* Adjust the scale as needed */
-                                                 margin: 5px;"></th> <!-- Checkbox to select all -->
-                            <th class="">Member ID</th>
-                            <th class="">Name</th>
-                            <th class="">Plan</th>
-                            <th class="">Package</th>
-                            <th class="">End date</th>
-                            <th class="">Status</th>
-                            <th class="">Message</th>
+                            <th class="ps-4">
+                                <label class="custom-check-container">
+                                    <input type="checkbox" id="select_all_custom">
+                                    <span class="checkmark"></span>
+                                </label>
+                            </th>
+                            <th>Member Details</th>
+                            <th>Subscription</th>
+                            <th>Expiration</th>
+                            <th class="text-center">Remaining</th>
+                            <th class="text-end pe-4">Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
-                        $i = 1;
-                        $filter_date_start = isset($_POST['start_date']) ? $_POST['start_date'] : date('Y-m-d');
-                        $filter_date_end = isset($_POST['end_date']) ? $_POST['end_date'] : date('Y-m-d');
-
-                        // Convert dates to 'YYYY-MM-DD' format
-                        $filter_date_start = DateTime::createFromFormat('Y-m-d', $filter_date_start) ? DateTime::createFromFormat('Y-m-d', $filter_date_start)->format('Y-m-d') : date('Y-m-d');
-                        $filter_date_end = DateTime::createFromFormat('Y-m-d', $filter_date_end) ? DateTime::createFromFormat('Y-m-d', $filter_date_end)->format('Y-m-d') : date('Y-m-d');
-
-                        // Adjust the query to use both start and end dates
-                        $member =  $conn->query("SELECT r.*, p.plan, pp.package, CONCAT(m.lastname, ' ', m.firstname, ' ', m.middlename) AS name, r.member_id, m.contact as mobile_number 
-                            FROM registration_info r 
-                            INNER JOIN members m ON m.id = r.member_id 
-                            INNER JOIN plans p ON p.id = r.plan_id 
-                            INNER JOIN packages pp ON pp.id = r.package_id 
-                            WHERE r.status = 1 AND DATE_FORMAT(r.end_date, '%Y-%m-%d') BETWEEN '$filter_date_start' AND '$filter_date_end' 
-                            ORDER BY r.end_date ASC");
-                        while ($row = $member->fetch_assoc()) :
+                        $start = isset($_POST['start_date']) ? $_POST['start_date'] : date('Y-m-d');
+                        $end = isset($_POST['end_date']) ? $_POST['end_date'] : date('Y-m-d');
+                        $members = $conn->query("
+                            SELECT r.*, p.plan, pp.package, CONCAT(m.lastname,' ',m.firstname,' ',m.middlename) AS name, m.contact AS mobile_number
+                            FROM registration_info r
+                            INNER JOIN members m ON m.id = r.member_id
+                            INNER JOIN plans p ON p.id = r.plan_id
+                            INNER JOIN packages pp ON pp.id = r.package_id
+                            WHERE r.status=1 AND DATE(r.end_date) BETWEEN '$start' AND '$end'
+                            ORDER BY r.end_date ASC
+                        ");
+                        while ($row = $members->fetch_assoc()):
                         ?>
-                            <tr class="main-tr">
-                                <td class="text-center">
-                                    <input type="checkbox" class="member_checkbox" value="<?php echo $row['member_id']; ?>">
+                            <tr class="athlete-row">
+                                <td class="ps-4">
+                                    <label class="custom-check-container">
+                                        <input type="checkbox" class="member_checkbox" 
+                                            data-mobile="<?php echo $row['mobile_number'] ?>" 
+                                            data-id="<?php echo $row['member_id'] ?>">
+                                        <span class="checkmark"></span>
+                                    </label>
                                 </td>
-                                <td class="">
-                                    <p><b><?php echo $row['member_id'] ?></b></p>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="athlete-avatar">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-800 text-slate-900"><?php echo ucwords($row['name']) ?></div>
+                                            <div class="text-slate-400 small fw-600">ID: <?php echo $row['member_id'] ?></div>
+                                        </div>
+                                    </div>
                                 </td>
-                                <td class="">
-                                    <p><b><?php echo ucwords($row['name']) ?></b></p>
+                                <td>
+                                    <div class="fw-700 text-slate-700"><?php echo $row['plan'] . ' Months' ?></div>
+                                    <div class="text-slate-400 small fw-500"><?php echo $row['package'] ?></div>
                                 </td>
-                                <td class="">
-                                    <p><b><?php echo $row['plan'] . ' Months' ?></b></p>
-                                </td>
-                                <td class="">
-                                    <p><b><?php echo $row['package'] ?></b></p>
-                                </td>
-                                <td class="">
-                                    <p><?php echo date("d-M-Y", strtotime($row['end_date'])) ?></p>
+                                <td>
+                                    <div class="fw-700 text-indigo-600"><?php echo date('d M, Y', strtotime($row['end_date'])) ?></div>
                                 </td>
                                 <td class="text-center">
                                     <?php
-                                    $end_date = $row['end_date'];
-                                    $days_remaining = ceil((strtotime($end_date) - time()) / (60 * 60 * 24));
-                                    if ($days_remaining > 0) {
-                                        echo "<span class='badge badge-success'>$days_remaining days remaining</span>";
-                                    } else {
-                                        echo "<span class='badge badge-danger'>Expired</span>";
-                                    }
+                                    $days_remaining = ceil((strtotime($row['end_date']) - time()) / (60 * 60 * 24));
+                                    $badge_class = ($days_remaining > 5) ? 'status-active' : (($days_remaining > 0) ? 'status-warning' : 'status-expired');
+                                    $label = ($days_remaining > 0) ? "$days_remaining Days Left" : "Expired";
                                     ?>
+                                    <span class="validity-badge <?php echo $badge_class ?>">
+                                        <i class="fas <?php echo ($days_remaining > 0) ? 'fa-hourglass-half' : 'fa-exclamation-circle' ?> me-1"></i> <?php echo $label ?>
+                                    </span>
                                 </td>
-                                <td class="iframe_<?php echo $row['member_id']; ?>">
-
+                                <td class="text-end pe-4 delivery-status">
+                                    <span class="text-slate-300"><i class="fas fa-clock me-1"></i> Waiting</span>
                                 </td>
                             </tr>
                         <?php endwhile; ?>
@@ -143,78 +151,349 @@ if ($wa_rowcount > 0) {
             </div>
         </div>
     </div>
-    <!-- Table Panel -->
 </div>
-</div>
-<script>
-    $(".end_date_picker").datepicker({
-        changeMonth: true,
-        changeYear: true,
-        dateFormat: 'yy-m-dd',
-        onSelect: function(dateText) {
-            $(this).val(dateText);
-        }
-    });
-    $(".end_date_picker").on("focus", function() {
-        $(this).datepicker("show");
-    });
-    $(".start_date_picker").datepicker({
-        changeMonth: true,
-        changeYear: true,
-        dateFormat: 'yy-m-dd',
-        onSelect: function(dateText) {
-            $(this).val(dateText);
-        }
-    });
-    $(".start_date_picker").on("focus", function() {
-        $(this).datepicker("show");
-    });
-    document.getElementById('select_all').addEventListener('click', function() {
-        var checkboxes = document.querySelectorAll('.member_checkbox');
-        for (var checkbox of checkboxes) {
-            checkbox.checked = this.checked;
-        }
-    });
 
-    function removeIframe(iframeId, status) {
-        const iframe = document.getElementById(iframeId);
-        $('.main-tr').each(function() {
-            if (status == 'success') {
-                $(this).find(`.${iframeId}`).html('<span class="badge badge-success">sent</span>');
+<!-- Invisible Capture Container to prevent layout shifts -->
+<div id="temp-capture-shell" style="position: fixed; top: 0; left: -5000px; width: 850px; z-index: -9999; pointer-events: none; background: white;">
+    <div id="temp-canvas-container" style="width: 800px; background: white; padding: 20px;"></div>
+</div>
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    
+    :root {
+        --indigo-500: #6366f1;
+        --indigo-600: #4f46e5;
+        --slate-100: #f1f5f9;
+        --slate-300: #cbd5e1;
+        --slate-400: #94a3b8;
+        --slate-500: #64748b;
+        --slate-600: #475569;
+        --slate-800: #1e293b;
+        --slate-900: #0f172a;
+    }
+
+    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+    .fw-800 { font-weight: 800; }
+    .fw-700 { font-weight: 700; }
+    
+    .shadow-premium { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02); }
+    
+    .connection-status-pill {
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+    }
+    .status-online { background: #dcfce7; color: #166534; }
+    .status-offline { background: #fee2e2; color: #991b1b; }
+
+    .athlete-avatar {
+        width: 40px;
+        height: 40px;
+        background: var(--slate-100);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--indigo-600);
+        margin-right: 15px;
+    }
+
+    .validity-badge {
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        display: inline-flex;
+        align-items: center;
+    }
+    .status-active { background: #dcfce7; color: #166534; }
+    .status-warning { background: #fef3c7; color: #92400e; }
+    .status-expired { background: #fee2e2; color: #991b1b; }
+
+    .btn-indigo-premium {
+        background: linear-gradient(135deg, var(--indigo-600) 0%, #4338ca 100%);
+        color: white;
+        border: none;
+        transition: all 0.3s ease;
+    }
+    .btn-indigo-premium:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.1);
+        color: white;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    }
+
+    .athlete-row { transition: all 0.2s; border-left: 4px solid transparent; }
+    .athlete-row:hover { background-color: #f8fafc; border-left-color: var(--indigo-600); }
+
+    /* Custom Premium Checkbox */
+    .custom-check-container {
+        display: block;
+        position: relative;
+        padding-left: 30px;
+        cursor: pointer;
+        user-select: none;
+        width: 24px;
+        height: 24px;
+    }
+
+    .custom-check-container input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+    }
+
+    .checkmark {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 24px;
+        width: 24px;
+        background-color: #fff;
+        border: 2px solid var(--slate-300);
+        border-radius: 8px;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .custom-check-container:hover input ~ .checkmark {
+        border-color: var(--indigo-500);
+        background-color: #f5f7ff;
+    }
+
+    .custom-check-container input:checked ~ .checkmark {
+        background-color: var(--indigo-600);
+        border-color: var(--indigo-600);
+        box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2);
+    }
+
+    .checkmark:after {
+        content: "";
+        position: absolute;
+        display: none;
+    }
+
+    .custom-check-container input:checked ~ .checkmark:after {
+        display: block;
+    }
+
+    .custom-check-container .checkmark:after {
+        left: 8px;
+        top: 4px;
+        width: 5px;
+        height: 10px;
+        border: solid white;
+        border-width: 0 2.5px 2.5px 0;
+        transform: rotate(45deg);
+    }
+
+    .input-group-text { border-color: #e2e8f0; }
+    .form-control:focus { border-color: var(--indigo-600); box-shadow: none; }
+
+    /* Mobile Responsive Overrides for Checkbox */
+    @media (max-width: 991px) {
+        #expire-table tbody td:first-child { 
+            display: flex !important; 
+            position: absolute !important;
+            top: 15px !important;
+            right: 15px !important;
+            width: auto !important;
+            border: none !important;
+            background: transparent !important;
+            padding: 0 !important;
+            z-index: 10 !important;
+        }
+        
+        #expire-table tbody tr {
+            position: relative !important;
+            padding-right: 50px !important; /* Make room for absolute checkbox */
+        }
+
+        /* Adjust Avatar/Details for mobile layout */
+        .athlete-avatar {
+            width: 45px !important;
+            height: 45px !important;
+            margin-right: 12px !important;
+        }
+
+        .fw-800.text-slate-900 {
+            font-size: 1rem !important;
+            max-width: 180px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Extreme Specificity Override */
+        body .table-responsive #expire-table tbody tr td:first-child {
+            display: flex !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            position: absolute !important;
+            top: 20px !important;
+            right: 20px !important;
+            width: 30px !important;
+            height: 30px !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            border: none !important;
+            background: transparent !important;
+            z-index: 999 !important;
+        }
+        
+        body .table-responsive #expire-table tbody tr {
+            position: relative !important;
+            padding-top: 1.5rem !important;
+        }
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="assets/js/socket.io.min.js"></script>
+<script src="assets/js/sweetalert2.js"></script>
+
+<script>
+    $(document).ready(function() {
+        const Toast = Swal.mixin({
+            toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true,
+        });
+
+        const socket = io('https://utility.lifelinefitnessstudio.com/');
+
+        $(".end_date_picker, .start_date_picker").datepicker({
+            changeMonth: true, changeYear: true, dateFormat: 'yy-mm-dd'
+        });
+
+        $("#select_all_custom").change(function() {
+            $('.member_checkbox').prop('checked', this.checked);
+            $("#mobile_select_all").prop('checked', this.checked); // Sync mobile
+            if(this.checked) {
+                $('.athlete-row').addClass('bg-indigo-50 border-left-color: var(--indigo-600)');
             } else {
-                $(this).find(`.${iframeId}`).html('<span class="badge badge-danger">Failed</span>');
+                $('.athlete-row').removeClass('bg-indigo-50');
+            }
+        });
+
+        $("#mobile_select_all").change(function() {
+            $('.member_checkbox').prop('checked', this.checked);
+            $("#select_all_custom").prop('checked', this.checked); // Sync desktop
+            if(this.checked) {
+                $('.athlete-row').addClass('bg-indigo-50');
+            } else {
+                $('.athlete-row').removeClass('bg-indigo-50');
+            }
+        });
+
+        $(document).on('change', '.member_checkbox', function() {
+            if(this.checked) {
+                $(this).closest('.athlete-row').addClass('bg-indigo-50');
+            } else {
+                $(this).closest('.athlete-row').removeClass('bg-indigo-50');
+            }
+        });
+
+        function createWhatsappPhone(number) {
+            number = String(number).replace(/\D/g, '');
+            if (number.length == 10) return "91" + number;
+            if (number.length == 11 && number.startsWith('0')) return "91" + number.substring(1);
+            return number;
+        }
+
+        // Global Progress Listeners
+        socket.off("bulk-progress");
+        socket.on("bulk-progress", function(data) {
+            let row = $('.member_checkbox').filter(function() {
+                return createWhatsappPhone($(this).data('mobile')) === createWhatsappPhone(data.number);
+            }).closest('tr');
+
+            if (row.length) {
+                if (data.status == "sent") {
+                    row.find('.delivery-status').html('<span class="badge bg-success rounded-pill px-3 py-2"><i class="fas fa-check me-1"></i> Sent</span>');
+                } else {
+                    row.find('.delivery-status').html('<span class="badge bg-danger rounded-pill px-3 py-2"><i class="fas fa-times me-1"></i> Failed</span>');
+                }
+            }
+        });
+
+        socket.off("bulk-complete");
+        socket.on("bulk-complete", function(data) {
+            $("#send_message").html('<i class="fas fa-paper-plane me-2"></i> Notify Selected').prop('disabled', false);
+            Swal.fire({ title: 'Notifications Sent!', text: 'The broadcast has been completed successfully.', icon: 'success' });
+        });
+
+        // Handle Send
+        $("#send_message").click(async function () {
+            let selected = $('.member_checkbox:checked');
+            if (selected.length == 0) return Toast.fire({ icon: 'warning', title: 'Please select at least one member' });
+
+            const confirm = await Swal.fire({
+                title: 'Launch Broadcast?',
+                text: `You are about to send digital receipts to ${selected.length} members.`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, Send All',
+                confirmButtonColor: '#4f46e5'
+            });
+
+            if (!confirm.isConfirmed) return;
+
+            $(this).html('<i class="fas fa-spinner fa-spin me-2"></i> Preparing Broadcast...').prop('disabled', true);
+
+            let numbers = [];
+            let base64DataArray = [];
+            let tempContainer = document.getElementById('temp-canvas-container');
+
+            for (let i = 0; i < selected.length; i++) {
+                let member_id = $(selected[i]).data('id');
+                let mobile_number = createWhatsappPhone($(selected[i]).data('mobile'));
+                
+                // Update status in UI
+                $(selected[i]).closest('tr').find('.delivery-status').html('<span class="text-indigo-600 fw-700 animate__animated animate__pulse animate__infinite"><i class="fas fa-sync fa-spin me-1"></i> Capturing...</span>');
+
+                numbers.push(mobile_number);
+
+                try {
+                    const htmlContent = await $.get('send_receipt.php', { id: member_id, wp: 'send' });
+                    const tempDiv = document.createElement('div');
+                    tempDiv.style.width = '800px'; // Set fixed width for capture consistency
+                    tempDiv.innerHTML = htmlContent;
+                    tempContainer.appendChild(tempDiv);
+
+                    // Small delay to allow browser to paint/layout
+                    await new Promise(resolve => setTimeout(resolve, 300));
+
+                    const canvas = await html2canvas(tempDiv, { 
+                        useCORS: true, 
+                        scale: 1.5, // Better quality
+                        logging: false,
+                        backgroundColor: '#ffffff',
+                        windowWidth: 800
+                    });
+                    
+                    base64DataArray.push(canvas.toDataURL('image/jpeg', 0.8));
+                    tempContainer.removeChild(tempDiv);
+                } catch (err) {
+                    console.error("Capture error for member " + member_id, err);
+                }
             }
 
-        });
-        if (iframe) {
-            iframe.parentNode.removeChild(iframe);
-        }
-        $('#send_message').html('Send To Selected').prop('disabled', false);
-    }
-    document.getElementById('send_message').addEventListener('click', function() {
-        $(this).html('Sending...').prop('disabled', true);
-        var selectedNumbers = [];
-        var checkboxes = document.querySelectorAll('.member_checkbox:checked');
-        for (var checkbox of checkboxes) {
-            selectedNumbers.push(checkbox.value);
-        }
-        if (selectedNumbers.length > 0) {
-            selectedNumbers.forEach(function(member_id) {
-                var url = `send_receipt.php?id=${member_id}&wp=send`;
-                var iframe = document.createElement('iframe');
+            $(this).html('<i class="fas fa-paper-plane me-2"></i> Sending Messages...');
 
-                // Set iframe style to position it off-screen
-                iframe.style.position = 'absolute';
-                iframe.style.width = '100%';
-                iframe.style.height = '100%';
-                iframe.style.border = 'none';
-                iframe.style.left = '-9999px';
-                iframe.id = `iframe_${member_id}`;
-                iframe.src = url;
-                document.body.appendChild(iframe);
+            socket.emit('send-bulk-media', {
+                wa_token: '<?php echo $wa_token ?>',
+                user_id: <?php echo $_SESSION['login_id']; ?>,
+                numbers,
+                message: `Dear member, your membership has expired. Renew today!`,
+                mimeType: 'image/jpeg',
+                filename: 'receipt.jpg',
+                base64DataArray
             });
-        } else {
-            alert('No members selected.');
-        }
+        });
     });
-</script>
+</script>

@@ -1,216 +1,237 @@
 <?php include('db_connect.php'); ?>
-<div class="container-fluid">
-	<style>
-		input[type=checkbox] {
-			/* Double-sized Checkboxes */
-			-ms-transform: scale(1.5);
-			/* IE */
-			-moz-transform: scale(1.5);
-			/* FF */	
-			-webkit-transform: scale(1.5);
-			/* Safari and Chrome */
-			-o-transform: scale(1.5);
-			/* Opera */
-			transform: scale(1.5);
-			padding: 10px;
-		}
-	</style>
-	<div class="col-lg-12">
-		<div class="row mb-4 mt-4">
-			<div class="col-md-12">
 
-			</div>
-		</div>
-		<div class="row">
-			<!-- FORM Panel -->
+<div class="container-fluid py-2 py-md-4">
+    <!-- Premium Header -->
+    <div class="d-flex align-items-center justify-content-between mb-4 px-2">
+        <div>
+            <h2 class="fw-800 text-slate-900 mb-1">Membership Validity</h2>
+            <p class="text-slate-500 fw-500 mb-0">Track active plans and expiration dates</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-primary rounded-pill px-4" type="button" id="send_message">
+                <i class="fas fa-receipt me-2"></i> <span>Send Receipt</span>
+            </button>
+            <button class="btn btn-outline-primary rounded-pill px-4" type="button" id="send_message_only">
+                <i class="fab fa-whatsapp me-2"></i> <span>WhatsApp Msg</span>
+            </button>
+            <button class="btn btn-primary rounded-pill px-4 shadow-sm" type="button" id="new_member">
+                <i class="fas fa-plus me-2"></i> <span>New Membership</span>
+            </button>
+        </div>
+    </div>
 
-			<!-- Table Panel -->
-			<div class="col-md-12">
-				<div class="card">
-					<div class="card-header">
-						<b>Active Member List</b>
-						<span class="">
-
-							<button class="btn btn-primary btn-block btn-sm col-sm-2 float-right ml-2 mt-2" type="button" id="send_message">
-								<i class="fa fa-paper-plane"></i> Send Receipt</button>
-							<button class="btn btn-primary btn-block btn-sm col-sm-2 float-right ml-2 mt-2" type="button" id="send_message_only">
-								<i class="fa fa-paper-plane"></i> Send Mesasge</button>
-								<button class="btn btn-primary btn-block btn-sm col-sm-2 float-right" type="button" id="new_member">
-								<i class="fa fa-plus"></i> New</button>
-						</span>
-					</div>
-					<div class="card-body">
-
-						<table class="table table-bordered table-condensed table-hover">
-							<colgroup>
-								<col width="5%">
-								<col width="10%">
-								<col width="20%">
-								<col width="15%">
-								<col width="10%">
-								<col width="10%">
-								<col width="15%">
-								<col width="15%">
-							</colgroup>
-							<thead>
-								<tr>
-									<th class="text-center">#</th>
-									<th class="">Member ID</th>
-									<th class="">Name</th>
-									<th class="">Plan</th>
-									<th class="">Package</th>
-									<th class="">End date</th>
-									<th class="">Status</th>
-									<th class="text-center">Action</th>
-								</tr>
-							</thead>
-							<tbody>
-								<?php
-								$i = 1;
-								$member =  $conn->query("SELECT r.*,p.plan,pp.package,concat(m.lastname,' ',m.firstname,' ',m.middlename) as name,r.member_id from registration_info r inner join members m on m.id = r.member_id inner join plans p on p.id = r.plan_id inner join packages pp on pp.id = r.package_id where r.status = 1 order by r.id desc");
-								while ($row = $member->fetch_assoc()) :
-								?>
-									<tr>
-
-										<td class="text-center"><?php echo $i++ ?></td>
-										<td class="">
-											<p><b><?php echo $row['member_id'] ?></b></p>
-
-										</td>
-										<td class="">
-											<p><b><?php echo ucwords($row['name']) ?></b></p>
-
-										</td>
-										<td class="">
-											<p><b><?php echo $row['plan'] . 'Months' ?></b></p>
-										</td>
-										<td class="">
-											<p><b><?php echo $row['package'] ?></b></p>
-
-										</td>
-										<td class="">
-											<p><?php echo date("d-M-Y", strtotime($row['end_date'])) ?></p>
-
-										</td>
-										<td class="text-center">
-  <?php 
-    $end_date = $row['end_date'];
-    $days_remaining = ceil((strtotime($end_date) - time()) / (60 * 60 * 24));
-    if ($days_remaining > 0) {
-      echo "<span class='badge badge-success'>$days_remaining days remaining</span>";
-    } else {
-      echo "<span class='badge badge-danger'>Expired</span>";
-    }
-  ?>
-</td>
-										<td class="text-center">
-											<button class="btn btn-sm btn-outline-primary view_member" type="button" data-id="<?php echo $row['id'] ?>">View</button>
-											<?php
-											if (isset($_GET['receipt_id'])) {
-												$qry = $conn->query("SELECT *,concat(lastname,' ',firstname,' ',middlename) as name FROM members where member_id=" . $_GET['receipt_id'])->fetch_array();
-												foreach ($qry as $k => $v) {
-													$$k = $v;
-												}
-											}
-
-											?>
-											<button class="btn btn-sm btn-outline-primary view__member" type="button" data-id="<?php echo $row['member_id'] ?>">Receipt</button>
-										
-
-										</td>
-									</tr>
-								<?php endwhile; ?>
-							</tbody>
-						</table>
-					</div>
-				</div>
-			</div>
-			<!-- Table Panel -->
-		</div>
-	</div>
-
+    <!-- Main Table Card -->
+    <div class="card border-0 shadow-premium rounded-4 overflow-hidden">
+        <div class="card-body p-0">
+            <div class="p-2 p-md-3 bg-white border-bottom d-flex flex-wrap gap-2 align-items-center">
+                <div id="table-filter-container" class="flex-grow-1"></div>
+                <select id="sort-filter" class="form-select form-select-sm border-0 bg-slate-50 fw-600 text-slate-600 rounded-pill px-3" style="width: auto; height: 34px;">
+                    <option value="0">Sort: Default</option>
+                    <option value="1">Sort: Name (A-Z)</option>
+                    <option value="4">Sort: Expiry Date</option>
+                    <option value="5">Sort: Days Left</option>
+                </select>
+                <select id="status-filter" class="form-select form-select-sm border-0 bg-slate-50 fw-600 text-slate-600 rounded-pill px-3" style="width: auto; height: 34px;">
+                    <option value="">Filter: All</option>
+                    <option value="status-active">Active Only</option>
+                    <option value="status-warning">Expiring Soon</option>
+                    <option value="status-expired">Expired Only</option>
+                </select>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-middle mb-0" id="validity-table">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">No.</th>
+                            <th>Member</th>
+                            <th>Subscription Plan</th>
+                            <th>Service Package</th>
+                            <th>Expiration</th>
+                            <th class="text-center">Remaining</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data loaded via Ajax -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
+
 <style>
-	td {
-		vertical-align: middle !important;
-	}
+    .fw-800 { font-weight: 800; }
+    .fw-700 { font-weight: 700; }
+    
+    .athlete-avatar {
+        width: 40px;
+        height: 40px;
+        background: var(--slate-100);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+        font-weight: 800;
+        margin-right: 12px;
+        overflow: hidden;
+    }
 
-	td p {
-		margin: unset
-	}
+    .validity-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
 
-	img {
-		max-width: 227px;
-		margin-left: 60px;
-		max-height: 150px;
-	}
+    .status-active { background: #dcfce7 !important; color: #166534 !important; }
+    .status-warning { background: #fef3c7 !important; color: #92400e !important; }
+    .status-expired { background: #fee2e2 !important; color: #991b1b !important; }
+
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-2px);
+        filter: brightness(0.9);
+    }
 </style>
+
 <script>
-	
 	$(document).ready(function() {
-		$('table').dataTable({
-            "pageLength": 50
-        })
+		var table = $('#validity-table').DataTable({
+            "processing": true,
+            "autoWidth": false,
+            "ajax": "ajax.php?action=get_registered_members",
+            "deferRender": true,
+            "columns": [
+                { 
+                    "data": null,
+                    "render": function (data, type, row, meta) {
+                        return '<span class="text-slate-400 fw-700 small ps-3">' + (meta.row + 1).toString().padStart(2, '0') + '</span>';
+                    }
+                },
+                { 
+                    "data": "name",
+                    "render": function (data, type, row) {
+                        var initial = data.charAt(0).toUpperCase();
+                        var avatar_content = row.profile_pic ? '<img src="assets/uploads/' + row.profile_pic + '" class="img-fluid view_img" data-src="assets/uploads/' + row.profile_pic + '" style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;">' : initial;
+                        return '<div class="d-flex align-items-center">' +
+                                    '<div class="athlete-avatar">' + avatar_content + '</div>' +
+                                    '<div>' +
+                                        '<div class="fw-700 text-slate-900">' + data + '</div>' +
+                                        '<div class="small text-slate-400 fw-600">ID: ' + row.member_id + '</div>' +
+                                    '</div>' +
+                                '</div>';
+                    }
+                },
+                { 
+                    "data": "plan",
+                    "render": function (data) {
+                        return '<div class="fw-700 text-slate-700"><i class="fas fa-calendar-alt me-2 text-slate-300"></i>' + data + ' Months</div>';
+                    }
+                },
+                { 
+                    "data": "package",
+                    "render": function (data) {
+                        return '<span class="badge bg-slate-100 text-slate-600 rounded-pill px-3 py-2 fw-700">' + data + '</span>';
+                    }
+                },
+                { 
+                    "data": "end_date",
+                    "render": function (data) {
+                        return '<div class="fw-600 text-slate-700">' + moment(data).format('DD MMM, YYYY') + '</div>';
+                    }
+                },
+                { 
+                    "data": "end_date",
+                    "className": "text-center",
+                    "render": function (data) {
+                        var end = moment(data);
+                        var now = moment();
+                        var diff = end.diff(now, 'days');
+                        var status_class = (diff > 5) ? 'status-active' : ((diff > 0) ? 'status-warning' : 'status-expired');
+                        
+                        // We include the class name in the text for custom filtering
+                        if (diff > 0) {
+                            return '<div class="validity-badge ' + status_class + '"><i class="fas fa-hourglass-half me-1"></i> ' + diff + ' days left <span class="d-none">' + status_class + '</span></div>';
+                        } else {
+                            return '<div class="validity-badge ' + status_class + '"><i class="fas fa-exclamation-circle me-1"></i> Expired <span class="d-none">' + status_class + '</span></div>';
+                        }
+                    }
+                },
+                { 
+                    "data": "id",
+                    "className": "text-end pe-4",
+                    "render": function (data, type, row) {
+                        return '<div class="d-flex align-items-center justify-content-end gap-2">' +
+                                    '<button class="action-btn view_member" title="View Details" data-id="' + data + '" style="background: #f0fdf4; color: #166534;"><i class="fas fa-info-circle"></i></button>' +
+                                    '<button class="action-btn view__member" title="Generate Receipt" data-id="' + row.member_id + '" style="background: #eef2ff; color: #4338ca;"><i class="fas fa-file-invoice-dollar"></i></button>' +
+                                '</div>';
+                    }
+                }
+            ],
+            "pageLength": 25,
+            "dom": 'f rtip',
+            "language": {
+                "search": "",
+                "searchPlaceholder": "Filter records..."
+            }
+        });
+        
+        // Custom Filtering Logic
+        $('#status-filter').on('change', function() {
+            table.search($(this).val()).draw();
+        });
+
+        $('#sort-filter').on('change', function() {
+            var colIndex = parseInt($(this).val());
+            var direction = (colIndex === 1) ? 'asc' : 'desc'; // A-Z for name, latest/soonest for others
+            table.order([colIndex, direction]).draw();
+        });
+
+        $('.dataTables_filter').appendTo('#table-filter-container');
+        $('.dataTables_filter').addClass('w-100');
+        $('.dataTables_filter input').addClass('w-100 border bg-white px-3 shadow-sm rounded-pill').css({
+            'height': '40px',
+            'border-color': '#e2e8f0'
+        });
 	})
+
 	$('#new_member').click(function() {
-		uni_modal("<i class='fa fa-plus'></i> New Membership Plan", "manage_membership.php", '')
+		uni_modal("<i class='fas fa-plus-circle me-2'></i>New Membership Plan", "manage_membership.php", '')
 	})
+
 	$('#send_message').click(function() {
 		window.location.href = 'index.php?page=send_expire_msg';
 	})
+
 	$('#send_message_only').click(function() {
 		window.location.href = 'index.php?page=send_msg_only';
 	})
-	$('.view_member').click(function(){
-		uni_modal("<i class='fa fa-address-card'></i> Member Plan Details","view_pdetails.php?id="+$(this).attr('data-id'),'')
 
+	$('#validity-table').on('click', '.view_member', function(){
+		uni_modal("<i class='fas fa-id-card me-2'></i>Plan Details","view_pdetails.php?id="+$(this).attr('data-id'),'large')
 	})
-	$('.edit_member').click(function() {
-		uni_modal("<i class='fa fa-edit'></i> Manage Member Details", "manage_member.php?id=" + $(this).attr('data-id'), 'mid-large')
 
+	$('#validity-table').on('click', '.view__member', function(){
+		uni_modal("<i class='fas fa-receipt me-2'></i>Membership Receipt","view_member.php?id="+$(this).attr('data-id'),'modal-a4')
 	})
-	$('.view__member').click(function(){
-		uni_modal("<i class='fa fa-address-card'></i> Member Plan Details","view_member.php?id="+$(this).attr('data-id'),'large')
 
-	})
-	
-
-	function delete_member($id) {
-		start_load()
-
-		$.ajax({
-
-			url: 'ajax.php?action=delete_member',
-			method: 'POST',
-			data: {
-				id: $id
-			},
-			success: function(resp) {
-				if (resp == 1) {
-					alert_toast("Data successfully deleted", 'success')
-					setTimeout(function() {
-						location.reload()
-					}, 1500)
-
-				}
-			}
-		})
-	}
-function closeOpenModal() {
-    // Get all open modals
-    var openModals = document.querySelectorAll('.modal.show');
-    
-    // Hide each open modal
-    openModals.forEach(function(modal) {
-      $(modal).modal('hide');
-    });
-  }
-
-  // Event listener for keypress
-  document.addEventListener('keydown', function(event) {
-    // Check if the Esc key was pressed (key code 27)
-    if (event.keyCode === 27) {
-      closeOpenModal(); // Call the function to close the modal
-    }
-  });
+    $('#validity-table').on('click', '.view_img', function(){
+        viewer_modal($(this).attr('data-src'))
+    })
 </script>

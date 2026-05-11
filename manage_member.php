@@ -103,17 +103,45 @@ if (isset($_GET['id'])) {
             </div>
 
         </div>
+        <div class="row form-group">
+            <div class="col-md-6">
+                <label class="control-label">Member Image</label>
+                <input type="file" name="img" class="form-control" onchange="displayImg(this,$(this))">
+            </div>
+            <div class="col-md-6">
+                <img src="<?php echo isset($profile_pic) ? 'assets/uploads/'.$profile_pic :'' ?>" alt="" id="cimg">
+            </div>
+        </div>
     </form>
 </div>
-
+<style>
+	img#cimg{
+		max-height: 150px;
+		max-width: 150px;
+	}
+</style>
 <script>
+    function displayImg(input,_this) {
+	    if (input.files && input.files[0]) {
+	        var reader = new FileReader();
+	        reader.onload = function (e) {
+	        	$('#cimg').attr('src', e.target.result);
+	        }
+
+	        reader.readAsDataURL(input.files[0]);
+	    }
+	}
 $('#manage-member').submit(function(e) {
     e.preventDefault()
     start_load()
     $.ajax({
         url: 'ajax.php?action=save_member',
+        data: new FormData($(this)[0]),
+        cache: false,
+        contentType: false,
+        processData: false,
         method: 'POST',
-        data: $(this).serialize(),
+        type: 'POST',
         success: function(resp)
 
         {

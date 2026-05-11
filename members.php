@@ -1,145 +1,176 @@
 <?php include('db_connect.php'); ?>
 
-<div class="container-fluid">
-    <style>
-        input[type=checkbox] {
-            /* Double-sized Checkboxes */
-            -ms-transform: scale(1.5);
-            /* IE */
-            -moz-transform: scale(1.5);
-            /* FF */
-            -webkit-transform: scale(1.5);
-            /* Safari and Chrome */
-            -o-transform: scale(1.5);
-            /* Opera */
-            transform: scale(1.5);
-            padding: 10px;
-        }
-    </style>
-    <div class="col-lg-12">
-        <div class="row mb-4 mt-4">
-            <div class="col-md-12">
-
-            </div>
+<div class="container-fluid py-2">
+    <!-- Header Section -->
+    <div class="d-flex align-items-end justify-content-between mb-4 px-2">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a href="index.php?page=home" class="text-decoration-none text-slate-400 fw-600 small">Dashboard</a></li>
+                    <li class="breadcrumb-item active text-slate-500 fw-600 small" aria-current="page">Members</li>
+                </ol>
+            </nav>
+            <h2 class="fw-800 text-slate-900 mb-0">Members Directory</h2>
         </div>
-        <div class="row">
-            <!-- FORM Panel -->
-
-            <!-- Table Panel -->
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <b>Member List</b>
-                        <span class="">
-
-                            <button class="btn btn-primary btn-block btn-sm col-sm-2 float-right" type="button" id="new_member">
-                                <i class="fa fa-plus"></i> New</button>
-                        </span>
-                    </div>
-                    <div class="card-body">
-
-                        <table class="table table-bordered table-condensed table-hover">
-                            <colgroup>
-                                <col width="5%">
-                                <col width="15%">
-                                <col width="20%">
-                                <col width="20%">
-                                <col width="20%">
-
-                                <col width="20%">
-                            </colgroup>
-                            <thead>
-                                <tr>
-                                    <th class="text-center">#</th>
-                                    <th class="">Member ID</th>
-                                    <th class="">Name</th>
-
-                                    <th class="">Contact</th>
-                                    <th class="">batch</th>
-                                    <th class="text-center">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php
-                                $i = 1;
-                                $member =  $conn->query("SELECT *,concat(firstname,' ',lastname,' ',middlename) as name from members order by id asc");
-                                while ($row = $member->fetch_assoc()) :
-                                ?>
-                                    <tr>
-
-                                        <td class="text-center"><?php echo $i++ ?></td>
-                                        <td class="">
-                                            <p><b><?php echo $row['member_id'] ?></b></p>
-
-                                        </td>
-                                        <td class="">
-                                            <p><b><?php echo ucwords($row['name']) ?></b></p>
-
-                                        </td>
-                                        <td class="">
-                                            <p><b><?php echo $row['contact'] ?></b></p>
-                                        </td>
-                                        <td class="">
-                                            <p><b><?php echo ucwords($row['batch']) ?></b></p>
-
-                                        </td>
-
-
-
-
-                                        <td class="text-center">
-                                            <button class="btn btn-sm btn-outline-primary view__member" type="button" data-id="<?php echo $row['id'] ?>">View</button>
-                                            <button class="btn btn-sm btn-outline-primary edit_member" type="button" data-id="<?php echo $row['id'] ?>">Edit</button>
-                                            <button class="btn btn-sm btn-outline-danger delete_member" type="button" data-id="<?php echo $row['id'] ?>">Delete</button>
-                                        </td>
-                                    </tr>
-                                <?php endwhile; ?>
-
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <!-- Table Panel -->
-        </div>
+        <button class="btn btn-primary shadow-premium px-4" type="button" id="new_member">
+            <i class="fas fa-user-plus me-2"></i> <span>Add Member</span>
+        </button>
     </div>
 
+    <!-- Table Container -->
+    <div class="card border-0 shadow-premium rounded-4 overflow-hidden">
+        <div class="p-3 p-md-4 border-bottom bg-white d-flex flex-wrap gap-3 align-items-center justify-content-between">
+            <h6 class="mb-0 fw-800 text-slate-800"><i class="fas fa-users me-2 text-primary"></i> All Registered Members</h6>
+            <div id="table-search-container" class="flex-grow-1" style="max-width: 400px;"></div>
+        </div>
+        <div class="table-responsive">
+            <table class="table align-middle" id="member-table">
+                <thead>
+                    <tr>
+                        <th class="ps-4" style="width: 80px;">No.</th>
+                        <th>Member</th>
+                        <th>Contact</th>
+                        <th>Session</th>
+                        <th class="text-end pe-4" style="width: 150px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data will be loaded via Ajax for high performance -->
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
+
 <style>
-    td {
-        vertical-align: middle !important;
+    .member-avatar {
+        width: 38px;
+        height: 38px;
+        background: var(--slate-100);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+        font-weight: 800;
+        margin-right: 12px;
+        font-size: 0.9rem;
     }
 
-    td p {
-        margin: unset
+    .badge-custom {
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
     }
 
-    .img2 {
-        max-width: 182px;
-        max-height: 150px;
+    .badge-morning { background: #fffbeb; color: #d97706; }
+    .badge-evening { background: #eef2ff; color: #4f46e5; }
+
+
+    .athlete-row:hover {
+        background-color: #fafafa !important;
+    }
+
+    .athlete-row:hover {
+        background-color: #fafafa !important;
     }
 </style>
+
 <script>
     $(document).ready(function() {
-        $('table').dataTable({
-            "pageLength": 50
-        })
-   })
+        var table = $('#member-table').DataTable({
+            "processing": true,
+            "serverSide": false,
+            "autoWidth": false,
+            "ajax": "ajax.php?action=get_members",
+            "deferRender": true,
+            "columns": [
+                { 
+                    "data": null,
+                    "render": function (data, type, row, meta) {
+                        return '<span class="text-slate-400 fw-700 small ps-3">' + (meta.row + 1).toString().padStart(2, '0') + '</span>';
+                    }
+                },
+                { 
+                    "data": "name",
+                    "render": function (data, type, row) {
+                        var initial = data.charAt(0).toUpperCase();
+                        return '<div class="d-flex align-items-center">' +
+                                    '<div class="member-avatar">' + initial + '</div>' +
+                                    '<div>' +
+                                        '<div class="fw-700 text-slate-900">' + data + '</div>' +
+                                        '<div class="small text-slate-400 fw-600">#' + row.member_id + '</div>' +
+                                    '</div>' +
+                                '</div>';
+                    }
+                },
+                { 
+                    "data": "contact",
+                    "render": function (data) {
+                        return '<span class="text-slate-600 fw-600 small"><i class="fas fa-phone-alt me-2 text-slate-200"></i>' + data + '</span>';
+                    }
+                },
+                { 
+                    "data": "batch",
+                    "render": function (data) {
+                        if (data == 'Morning') {
+                            return '<span class="badge-custom badge-morning"><i class="fas fa-sun me-1"></i> Morning</span>';
+                        } else {
+                            return '<span class="badge-custom badge-evening"><i class="fas fa-moon me-1"></i> Evening</span>';
+                        }
+                    }
+                },
+                { 
+                    "data": "id",
+                    "className": "text-end pe-4",
+                    "render": function (data) {
+                        return '<div class="d-flex align-items-center justify-content-end gap-2">' +
+                                    '<button class="icon-btn-premium icon-btn-view view__member" title="View" data-id="' + data + '"><i class="fas fa-eye"></i></button>' +
+                                    '<button class="icon-btn-premium icon-btn-edit edit_member" title="Edit" data-id="' + data + '"><i class="fas fa-edit"></i></button>' +
+                                    '<button class="icon-btn-premium icon-btn-delete delete_member" title="Delete" data-id="' + data + '"><i class="fas fa-trash-alt"></i></button>' +
+                                 '</div>';
+                    }
+                }
+            ],
+            "pageLength": 25,
+            "dom": 'f rtip',
+            "language": {
+                "search": "",
+                "searchPlaceholder": "Search by name, ID or contact...",
+                "processing": '<i class="fas fa-spinner fa-spin me-2"></i> Syncing records...'
+            },
+            "fnCreatedRow": function( nRow, aData, iDataIndex ) {
+                $(nRow).addClass('athlete-row');
+            }
+        });
+        
+        // Move search box to custom container
+        $('.dataTables_filter').appendTo('#table-search-container');
+        $('.dataTables_filter').addClass('w-100');
+        $('.dataTables_filter input').addClass('form-control border bg-white px-3 fw-600 text-slate-600 rounded-pill shadow-sm').css({
+            'height': '40px',
+            'border-color': '#e2e8f0'
+        });
+
+        // Re-attach event listeners after Ajax load
+        $('#member-table').on('click', '.view__member', function() {
+            uni_modal("<i class='fas fa-id-card me-2'></i>Member Profile", "view_member_detail.php?id=" + $(this).attr('data-id'), 'large')
+        });
+
+        $('#member-table').on('click', '.edit_member', function() {
+            uni_modal("<i class='fas fa-edit me-2'></i>Update Information", "manage_member.php?id=" + $(this).attr('data-id'), 'mid-large')
+        });
+
+        $('#member-table').on('click', '.delete_member', function() {
+            _conf("Are you sure you want to delete this member? This action is permanent.", "delete_member", [$(this).attr('data-id')])
+        });
+    });
+
     $('#new_member').click(function() {
-        uni_modal("<i class='fa fa-plus'></i> New Member", "manage_member.php", 'mid-large')
-    })
-    $('.view__member').click(function() {
-        uni_modal("<i class='fa fa-id-card'></i> Member Details", "view_member.php?id=" + $(this).attr('data-id'),
-            'large')
-
-    })
-    $('.edit_member').click(function() {
-        uni_modal("<i class='fa fa-edit'></i> Manage Member Details", "manage_member.php?id=" + $(this).attr(
-            'data-id'), 'mid-large')
-
-    })
-    $('.delete_member').click(function() {
-        _conf("Are you sure to delete this topic?", "delete_member", [$(this).attr('data-id')], 'mid-large')
+        uni_modal("<i class='fas fa-user-plus me-2'></i>Add New Member", "manage_member.php", 'mid-large')
     })
 
     function delete_member($id) {
@@ -147,16 +178,13 @@
         $.ajax({
             url: 'ajax.php?action=delete_member',
             method: 'POST',
-            data: {
-                id: $id
-            },
+            data: { id: $id },
             success: function(resp) {
                 if (resp == 1) {
-                    alert_toast("Data successfully deleted", 'success')
+                    alert_toast("Member removed successfully", 'success')
                     setTimeout(function() {
                         location.reload()
-                    }, 1500)
-
+                    }, 1000)
                 }
             }
         })

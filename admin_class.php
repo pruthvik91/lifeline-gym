@@ -37,6 +37,14 @@ class Action
 				return 2;
 				exit;
 			}
+			// Handle Remember Me
+			if(isset($remember)){
+				setcookie('gym_user', $username, time() + (86400 * 30), "/");
+				setcookie('gym_pass', $password, time() + (86400 * 30), "/");
+			} else {
+				setcookie('gym_user', '', time() - 3600, "/");
+				setcookie('gym_pass', '', time() - 3600, "/");
+			}
 			return 1;
 		} else {
 			return 3;
@@ -81,6 +89,8 @@ class Action
 		foreach ($_SESSION as $key => $value) {
 			unset($_SESSION[$key]);
 		}
+		setcookie('gym_user', '', time() - 3600, "/");
+		setcookie('gym_pass', '', time() - 3600, "/");
 		header("location:login.php");
 	}
 	function logout2()
@@ -380,6 +390,11 @@ class Action
 				// $data .= ", batch_id ='$batch_id' ";
 
 				$data .= ", start_date ='" . $start_date . "' ";
+                if ($_FILES['img']['tmp_name'] != '') {
+					$fname = strtotime(date('y-m-d H:i')) . '_' . $_FILES['img']['name'];
+					$move = move_uploaded_file($_FILES['img']['tmp_name'], 'assets/uploads/' . $fname);
+					$data .= ", profile_pic = '$fname' ";
+				}
 				$plan = $this->db->query("SELECT * FROM plans where id = $plan_id")->fetch_array()['plan'];
 
 				$data .= ", end_date ='" . date("Y-m-d", strtotime($start_date . ' +' . $plan . ' months')) . "' ";
@@ -394,6 +409,11 @@ class Action
 					return 2;
 					exit;
 				}
+			}
+            if ($_FILES['img']['tmp_name'] != '') {
+				$fname = strtotime(date('y-m-d H:i')) . '_' . $_FILES['img']['name'];
+				$move = move_uploaded_file($_FILES['img']['tmp_name'], 'assets/uploads/' . $fname);
+				$data .= ", profile_pic = '$fname' ";
 			}
 			$save = $this->db->query("UPDATE members set $data where id=" . $id);
 		}
@@ -468,7 +488,8 @@ class Action
 		extract($_POST);
 		$prev = $this->db->query("SELECT * FROM registration_info where id = $rid")->fetch_array();
 		$data = '';
-		
+		$new_plan_id = !empty($new_plan_id) ? $new_plan_id : $prev['plan_id'];
+		$prev['plan_id'] = $new_plan_id;
 		foreach ($prev as $k => $v) {
 			if (!empty($v) && !is_numeric($k) && !in_array($k, array('id', 'start_date', 'end_date', 'date_created'))) {
 				if (empty($data))
@@ -479,10 +500,8 @@ class Action
 				
 			}
 		}
-		
 		$data .= ", start_date ='" . $prev['end_date'] . "' ";
-		
-		$plan = $this->db->query("SELECT * FROM plans where id = $plan_id")->fetch_array()['plan'];
+		$plan = $this->db->query("SELECT * FROM plans where id = $new_plan_id")->fetch_array()['plan'];
 		$data .= ", end_date ='" . date("Y-m-d", strtotime($prev['end_date'] . ' +' . $plan . ' months')) . "' ";
 		$save = $this->db->query("INSERT INTO registration_info set $data");
 		if ($save) {
@@ -522,5 +541,27 @@ class Action
 			$this->db->query("UPDATE registration_info set status = 0 where member_id = $member_id and id != $id ");
 			return 1;
 		}
+	}
+
+	function get_members()
+	{
+		$qry = $this->db->query("SELECT *, concat(firstname,' ',lastname,' ',middlename) as name FROM members ORDER BY id ASC");
+		$data = array();
+		while ($row = $qry->fetch_assoc()) {
+			$row['name'] = ucwords($row['name']);
+			$data[] = $row;
+		}
+		return json_encode(array("data" => $data));
+	}
+
+	function get_registered_members()
+	{
+		$qry = $this->db->query("SELECT r.*,p.plan,pp.package,concat(m.firstname,' ',m.lastname) as name,r.member_id, m.profile_pic from registration_info r inner join members m on m.id = r.member_id inner join plans p on p.id = r.plan_id inner join packages pp on pp.id = r.package_id where r.status = 1 order by r.id desc");
+		$data = array();
+		while ($row = $qry->fetch_assoc()) {
+			$row['name'] = ucwords($row['name']);
+			$data[] = $row;
+		}
+		return json_encode(array("data" => $data));
 	}
 }

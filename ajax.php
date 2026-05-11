@@ -138,5 +138,15 @@ if($action == "save_membership"){
 	if($save)
 		echo $save;
 }	
+if($action == "get_members"){
+	$get = $crud->get_members();
+	if($get)
+		echo $get;
+}
+if($action == "get_registered_members"){
+	$get = $crud->get_registered_members();
+	if($get)
+		echo $get;
+}
 
 ob_end_flush();

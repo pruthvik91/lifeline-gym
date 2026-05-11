@@ -1,0 +1,22 @@
+{
+  "name": "Lifeline Fitness - Gym Management",
+  "short_name": "Lifeline Gym",
+  "description": "Premium Gym Management and Membership Tracking System",
+  "start_url": "index.php",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4f46e5",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "assets/img/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/img/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

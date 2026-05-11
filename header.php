@@ -1,12 +1,16 @@
-<meta content="" name="descriptison">
-<meta content="" name="keywords">
+<meta content="Lifeline Fitness Gym Management System" name="description">
+<meta content="gym management, fitness, membership tracking" name="keywords">
+<meta name="theme-color" content="#4f46e5">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lifeline Gym">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="assets/img/logo.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/img/logo.png">
 
 
 
-<!-- Google Fonts -->
-<link
-    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
-    rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/font-awesome/css/all.min.css">
 
 
@@ -25,8 +29,10 @@
 <link href="assets/css/select2.min.css" rel="stylesheet">
 
 
-<!-- Template Main CSS File -->
-<link href="assets/css/style.css" rel="stylesheet">
+<!-- Removed old template CSS to prevent conflicts -->
+<!-- <link href="assets/css/style.css" rel="stylesheet"> -->
+<!-- Modern Theme CSS -->
+<link href="assets/css/modern-theme.css" rel="stylesheet">
 <link type="text/css" rel="stylesheet" href="assets/css/jquery-te-1.4.0.css">
 <link href="assets/css/jquery-ui.min.css" rel="stylesheet">
 <!-- heh -->
@@ -53,5 +59,6 @@
 <script type="text/javascript" src="assets/js/jquery.datetimepicker.full.min.js"></script>
 <script type="text/javascript" src="assets/font-awesome/js/all.min.js"></script>
 <script type="text/javascript" src="assets/js/jquery-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 
 <!-- <script type="text/javascript" src="assets/js/jquery-te-1.4.0.min.js" charset="utf-8"></script> -->
