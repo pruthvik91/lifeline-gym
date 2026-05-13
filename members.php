@@ -6,17 +6,17 @@
         <div>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-1">
-                    <li class="breadcrumb-item"><a href="index.php?page=home" class="text-decoration-none text-slate-400 fw-600 small">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="admin-home" class="text-decoration-none text-slate-400 fw-600 small">Dashboard</a></li>
                     <li class="breadcrumb-item active text-slate-500 fw-600 small" aria-current="page">Members</li>
                 </ol>
             </nav>
             <h2 class="fw-800 text-slate-900 mb-0">Members Directory</h2>
         </div>
         <div class="d-flex gap-2">
-            <button class="btn btn-outline-success shadow-soft px-4" type="button" id="export_active">
+            <button class="btn btn-outline-success shadow-soft px-4 d-none" type="button" id="export_active">
                 <i class="fas fa-user-check me-2"></i> <span>Export Active</span>
             </button>
-            <button class="btn btn-outline-primary shadow-soft px-4" type="button" id="export_members">
+            <button class="btn btn-outline-primary shadow-soft px-4 d-none" type="button" id="export_members">
                 <i class="fas fa-file-export me-2"></i> <span>Export All</span>
             </button>
             <button class="btn btn-primary shadow-premium px-4" type="button" id="new_member">
@@ -140,7 +140,6 @@
                         var wa_link = "https://wa.me/91" + row.contact + "?text=" + wa_msg;
                         
                         return '<div class="d-flex align-items-center justify-content-end gap-2">' +
-                                    '<a href="' + wa_link + '" target="_blank" class="icon-btn-premium icon-btn-view" title="Send Login Link" style="background:#25D366;color:white;border-color:#25D366"><i class="fab fa-whatsapp"></i></a>' +
                                     '<button class="icon-btn-premium icon-btn-view view__member" title="View" data-id="' + data + '"><i class="fas fa-eye"></i></button>' +
                                     '<button class="icon-btn-premium icon-btn-edit edit_member" title="Edit" data-id="' + data + '"><i class="fas fa-edit"></i></button>' +
                                     '<button class="icon-btn-premium icon-btn-delete delete_member" title="Delete" data-id="' + data + '"><i class="fas fa-trash-alt"></i></button>' +

@@ -12,7 +12,7 @@
             </nav>
             <h2 class="fw-800 text-slate-900 mb-0" style="letter-spacing: -0.5px;">Financial Manager</h2>
         </div>
-        <a href="index.php?page=detailed_report" class="btn btn-primary shadow-premium px-4 py-2">
+        <a href="admin-detailed_report" class="btn btn-primary shadow-premium px-4 py-2">
             <i class="fas fa-file-invoice-dollar me-2"></i> Detailed Report
         </a>
     </div>

@@ -22,7 +22,7 @@ ob_end_flush();
     <?php include('./header.php'); ?>
     <?php
     if (isset($_SESSION['login_id']))
-	header("location:index.php?page=home");
+	header("location:admin-home");
 ?>
 	<link rel="stylesheet" href="./login.css?v=<?php echo URL_VERSION ?>">
 </head>
@@ -102,7 +102,7 @@ ob_end_flush();
 					$btnText.text('Success!');
 					$btnIcon.removeClass('fa-spinner fa-spin').addClass('fa-check');
 					setTimeout(() => {
-						location.href = 'index.php?page=home';
+						location.href = 'admin-home';
 					}, 500);
 				} else {
 					// Error - reset button and show error

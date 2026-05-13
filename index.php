@@ -12,9 +12,9 @@
 <?php
   if(!isset($_SESSION['login_id'])){
     if(isset($_GET['admin'])){
-      header('location:lifeline_hq.php');
+      header('location:lifeline_hq');
     }else{
-      header('location:login.php');
+      header('location:login');
     }
     exit;
   }
@@ -92,15 +92,15 @@
 
   <!-- Mobile Bottom Navigation -->
   <div class="mobile-bottom-nav">
-      <a href="index.php?page=home" class="mobile-nav-item <?php echo $page == 'home' ? 'active' : '' ?>">
+      <a href="admin-home" class="mobile-nav-item <?php echo $page == 'home' ? 'active' : '' ?>">
           <i class="fas fa-th-large"></i>
           <span>Home</span>
       </a>
-      <a href="index.php?page=members" class="mobile-nav-item <?php echo $page == 'members' ? 'active' : '' ?>">
+      <a href="admin-members" class="mobile-nav-item <?php echo $page == 'members' ? 'active' : '' ?>">
           <i class="fas fa-users"></i>
           <span>Members</span>
       </a>
-      <a href="index.php?page=registered_members" class="mobile-nav-item <?php echo $page == 'registered_members' ? 'active' : '' ?>">
+      <a href="admin-registered_members" class="mobile-nav-item <?php echo $page == 'registered_members' ? 'active' : '' ?>">
           <i class="fas fa-calendar-check"></i>
           <span>Validity</span>
       </a>
@@ -126,14 +126,18 @@
     t = t[t.length - 1].toLowerCase();
     if(t =='mp4'){
       var view = $("<video src='"+$src+"' controls autoplay class='img-fluid rounded-4'></video>")
+    }else if(t == 'pdf'){
+      var view = $("<iframe src='"+$src+"' width='100%' height='80vh' style='height:80vh' frameborder='0' class='rounded-4'></iframe>")
+      $('#viewer_modal .modal-dialog').addClass('modal-xl');
     }else{
       var view = $("<img src='"+$src+"' class='img-fluid rounded-4' />")
+      $('#viewer_modal .modal-dialog').removeClass('modal-xl');
     }
     $('#viewer_modal .viewer-container').html(view)
     $('#viewer_modal').modal({
             show:true,
             backdrop:'static',
-            keyboard:false,
+            keyboard:true,
             focus:true
           })
           end_load()  
@@ -158,7 +162,7 @@
                 $('#uni_modal').modal({
                   show:true,
                   backdrop:'static',
-                  keyboard:false,
+                  keyboard:true,
                   focus:true
                 })
                 end_load()

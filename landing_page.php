@@ -181,7 +181,7 @@
 
         <div class="portal-grid">
             <!-- Member Portal -->
-            <a href="login.php" class="portal-card">
+            <a href="login" class="portal-card">
                 <div class="icon-box">
                     <i class="fas fa-user-circle"></i>
                 </div>
@@ -193,7 +193,7 @@
             </a>
 
             <!-- Staff Portal -->
-            <a href="lifeline_hq.php" class="portal-card">
+            <a href="lifeline_hq" class="portal-card">
                 <div class="icon-box">
                     <i class="fas fa-shield-halved"></i>
                 </div>

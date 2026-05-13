@@ -91,7 +91,7 @@ class Action
 		}
 		setcookie('gym_user', '', time() - 3600, "/");
 		setcookie('gym_pass', '', time() - 3600, "/");
-		header("location:lifeline_hq.php");
+		header("location:lifeline_hq");
 	}
 	function logout2()
 	{
@@ -99,7 +99,7 @@ class Action
 		foreach ($_SESSION as $key => $value) {
 			unset($_SESSION[$key]);
 		}
-		header("location:../index.php");
+		header("location:../index");
 	}
 	function member_login()
 	{
@@ -110,6 +110,9 @@ class Action
 			$_SESSION['member_id'] = $res['id'];
 			$_SESSION['member_name'] = $res['firstname'] . ' ' . $res['lastname'];
 			$_SESSION['member_mid'] = $res['member_id'];
+
+			// Log the member login to Database
+			$this->db->query("INSERT INTO member_login_logs (member_id, member_mid, member_name) VALUES ('".$res['id']."', '".$res['member_id']."', '".$res['firstname']." ".$res['lastname']."')");
 
 			if (isset($remember)) {
 				setcookie('member_mid', $member_id, time() + (86400 * 30), "/");
@@ -131,7 +134,7 @@ class Action
 		}
 		setcookie('member_mid', '', time() - 3600, "/");
 		setcookie('member_phn', '', time() - 3600, "/");
-		header("location:index.php");
+		header("location:index");
 	}
 
 	function save_bmi()
@@ -682,12 +685,18 @@ class Action
 
 	function get_registered_members()
 	{
-		$qry = $this->db->query("SELECT r.*, p.plan, pp.package, concat(m.firstname,' ',m.lastname) as name, m.contact as contact, m.member_id as member_id, m.profile_pic from registration_info r inner join members m on m.id = r.member_id inner join plans p on p.id = r.plan_id inner join packages pp on pp.id = r.package_id where r.status = 1 order by r.id desc");
+		$qry = $this->db->query("SELECT r.*, m.id as member_db_id, p.plan, pp.package, concat(m.firstname,' ',m.lastname) as name, m.contact as contact, m.member_id as member_id, m.profile_pic from registration_info r inner join members m on m.id = r.member_id inner join plans p on p.id = r.plan_id inner join packages pp on pp.id = r.package_id where r.status = 1 order by r.id desc");
 		$data = array();
 		while ($row = $qry->fetch_assoc()) {
 			$row['name'] = ucwords($row['name']);
 			$data[] = $row;
 		}
 		return json_encode(array("data" => $data));
+	}
+
+	function clear_logs()
+	{
+		$this->db->query("TRUNCATE TABLE member_login_logs");
+		return 1;
 	}
 }

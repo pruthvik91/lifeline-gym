@@ -85,7 +85,7 @@ if ($wa_rowcount > 0) {
         <div>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-1">
-                    <li class="breadcrumb-item"><a href="index.php?page=home" class="text-decoration-none text-slate-400 fw-600 small">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="admin-home" class="text-decoration-none text-slate-400 fw-600 small">Dashboard</a></li>
                     <li class="breadcrumb-item active text-slate-500 fw-600 small" aria-current="page">WhatsApp</li>
                 </ol>
             </nav>
