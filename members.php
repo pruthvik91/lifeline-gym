@@ -12,17 +12,9 @@
             </nav>
             <h2 class="fw-800 text-slate-900 mb-0">Members Directory</h2>
         </div>
-        <div class="d-flex gap-2">
-            <button class="btn btn-outline-success shadow-soft px-4" type="button" id="export_active">
-                <i class="fas fa-user-check me-2"></i> <span>Export Active</span>
-            </button>
-            <button class="btn btn-outline-primary shadow-soft px-4" type="button" id="export_members">
-                <i class="fas fa-file-export me-2"></i> <span>Export All</span>
-            </button>
-            <button class="btn btn-primary shadow-premium px-4" type="button" id="new_member">
-                <i class="fas fa-user-plus me-2"></i> <span>Add Member</span>
-            </button>
-        </div>
+        <button class="btn btn-primary shadow-premium px-4" type="button" id="new_member">
+            <i class="fas fa-user-plus me-2"></i> <span>Add Member</span>
+        </button>
     </div>
 
     <!-- Table Container -->
@@ -134,13 +126,8 @@
                 { 
                     "data": "id",
                     "className": "text-end pe-4",
-                    "render": function (data, type, row) {
-                        var login_url = "https://lifelinefitnessstudio.com/login.php?mid=" + row.member_id + "&phn=" + row.contact;
-                        var wa_msg = encodeURIComponent("Hello " + row.name + "! Here is your Lifeline Gym portal login link: " + login_url);
-                        var wa_link = "https://wa.me/91" + row.contact + "?text=" + wa_msg;
-                        
+                    "render": function (data) {
                         return '<div class="d-flex align-items-center justify-content-end gap-2">' +
-                                    '<a href="' + wa_link + '" target="_blank" class="icon-btn-premium icon-btn-view" title="Send Login Link" style="background:#25D366;color:white;border-color:#25D366"><i class="fab fa-whatsapp"></i></a>' +
                                     '<button class="icon-btn-premium icon-btn-view view__member" title="View" data-id="' + data + '"><i class="fas fa-eye"></i></button>' +
                                     '<button class="icon-btn-premium icon-btn-edit edit_member" title="Edit" data-id="' + data + '"><i class="fas fa-edit"></i></button>' +
                                     '<button class="icon-btn-premium icon-btn-delete delete_member" title="Delete" data-id="' + data + '"><i class="fas fa-trash-alt"></i></button>' +

@@ -682,7 +682,7 @@ class Action
 
 	function get_registered_members()
 	{
-		$qry = $this->db->query("SELECT r.*, p.plan, pp.package, concat(m.firstname,' ',m.lastname) as name, m.contact as contact, m.member_id as member_id, m.profile_pic from registration_info r inner join members m on m.id = r.member_id inner join plans p on p.id = r.plan_id inner join packages pp on pp.id = r.package_id where r.status = 1 order by r.id desc");
+		$qry = $this->db->query("SELECT r.*, p.plan, pp.package, concat(m.firstname,' ',m.lastname) as name, m.contact as contact, m.member_id as m_id_str, m.profile_pic from registration_info r inner join members m on m.id = r.member_id inner join plans p on p.id = r.plan_id inner join packages pp on pp.id = r.package_id where r.status = 1 order by r.id desc");
 		$data = array();
 		while ($row = $qry->fetch_assoc()) {
 			$row['name'] = ucwords($row['name']);

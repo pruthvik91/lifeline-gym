@@ -424,11 +424,20 @@ if (isset($_SESSION['login_id'])) {
 </style>
 
 <?php
-if (isset($_GET['id'])) {
-  $qry = $conn->query("SELECT *,concat(firstname,' ',lastname,' ',middlename) as name FROM members where id=" . $_GET['id'])->fetch_array();
-  foreach ($qry as $k => $v) {
-    $$k = $v;
+if (isset($_GET['id']) && !empty($_GET['id'])) {
+  $member_qry = $conn->query("SELECT *,concat(firstname,' ',lastname,' ',middlename) as name FROM members where id=" . $_GET['id']);
+  if($member_qry->num_rows > 0){
+    $qry = $member_qry->fetch_array();
+    foreach ($qry as $k => $v) {
+      $$k = $v;
+    }
+  }else{
+    echo '<div class="alert alert-danger">Member not found.</div>';
+    exit;
   }
+} else {
+  echo '<div class="alert alert-danger">No Member ID provided.</div>';
+  exit;
 }
 ?>
 

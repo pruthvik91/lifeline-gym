@@ -105,6 +105,16 @@ if(isset($_GET['id'])){
 
     $('#manage-workout').submit(function(e){
         e.preventDefault()
+        
+        // Validation: Check if a file is selected (only if no file exists yet)
+        var hasExistingFile = <?php echo (isset($file_path) && !empty($file_path)) ? 'true' : 'false' ?>;
+        var hasNewFile = $('#workout_file')[0].files.length > 0;
+
+        if(!hasExistingFile && !hasNewFile){
+            alert_toast("Please select a workout plan file to upload before assigning.","danger");
+            return false;
+        }
+
         start_load()
         $.ajax({
             url:'ajax.php?action=assign_workout',

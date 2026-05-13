@@ -133,7 +133,7 @@
                                     '<div class="athlete-avatar">' + avatar_content + '</div>' +
                                     '<div>' +
                                         '<div class="fw-700 text-slate-900">' + data + '</div>' +
-                                        '<div class="small text-slate-400 fw-600">ID: ' + row.member_id + '</div>' +
+                                        '<div class="small text-slate-400 fw-600">ID: ' + row.m_id_str + '</div>' +
                                     '</div>' +
                                 '</div>';
                     }
