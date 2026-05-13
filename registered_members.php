@@ -186,6 +186,7 @@
             ],
             "pageLength": 25,
             "dom": 'f rtip',
+            "stateSave": true,
             "language": {
                 "search": "",
                 "searchPlaceholder": "Filter records..."
@@ -202,6 +203,26 @@
             var direction = (colIndex === 1) ? 'asc' : 'desc'; // A-Z for name, latest/soonest for others
             table.order([colIndex, direction]).draw();
         });
+
+        // Sync filters with saved state
+        var state = table.state.loaded();
+        if (state) {
+            // Sync Status Filter
+            var searchStr = state.search.search;
+            if (searchStr) {
+                $('#status-filter option').each(function() {
+                    if ($(this).val() === searchStr) {
+                        $('#status-filter').val(searchStr);
+                    }
+                });
+            }
+            
+            // Sync Sort Filter
+            if (state.order && state.order.length > 0) {
+                var orderCol = state.order[0][0];
+                $('#sort-filter').val(orderCol);
+            }
+        }
 
         $('.dataTables_filter').appendTo('#table-filter-container');
         $('.dataTables_filter').addClass('w-100');

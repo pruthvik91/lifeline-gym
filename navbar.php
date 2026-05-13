@@ -20,6 +20,12 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'home';
     <a href="index.php?page=registered_members" class="nav-link-modern <?php echo $page == 'registered_members' ? 'active' : '' ?>">
         <i class="fas fa-calendar-check"></i> Validity
     </a>
+    <a href="index.php?page=notices" class="nav-link-modern <?php echo $page == 'notices' ? 'active' : '' ?>">
+        <i class="fas fa-bullhorn"></i> Notices
+    </a>
+    <a href="index.php?page=workout_requests" class="nav-link-modern <?php echo $page == 'workout_requests' ? 'active' : '' ?>">
+        <i class="fas fa-dumbbell"></i> Workout Plans
+    </a>
 
     <?php if($_SESSION['login_type'] == 1): ?>
     <div class="nav-section-title">Gym Services</div>

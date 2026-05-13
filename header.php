@@ -1,3 +1,4 @@
+<?php include 'db_connect.php' ?>
 <meta content="Lifeline Fitness Gym Management System" name="description">
 <meta content="gym management, fitness, membership tracking" name="keywords">
 <meta name="theme-color" content="#4f46e5">
@@ -32,9 +33,9 @@
 <!-- Removed old template CSS to prevent conflicts -->
 <!-- <link href="assets/css/style.css" rel="stylesheet"> -->
 <!-- Modern Theme CSS -->
-<link href="assets/css/modern-theme.css" rel="stylesheet">
-<link type="text/css" rel="stylesheet" href="assets/css/jquery-te-1.4.0.css">
-<link href="assets/css/jquery-ui.min.css" rel="stylesheet">
+<link href="assets/css/modern-theme.css?v=<?php echo URL_VERSION ?>" rel="stylesheet">
+<link type="text/css" rel="stylesheet" href="assets/css/jquery-te-1.4.0.css?v=<?php echo URL_VERSION ?>">
+<link href="assets/css/jquery-ui.min.css?v=<?php echo URL_VERSION ?>" rel="stylesheet">
 <!-- heh -->
 <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-te/1.4.0/jquery-te.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-te/1.4.0/jquery-te.css"></script>

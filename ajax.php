@@ -23,6 +23,16 @@ if($action == 'logout2'){
 	if($logout)
 		echo $logout;
 }
+if($action == 'member_login'){
+	$login = $crud->member_login();
+	if($login)
+		echo $login;
+}
+if($action == 'member_logout'){
+	$logout = $crud->member_logout();
+	if($logout)
+		echo $logout;
+}
 if($action == 'save_user'){
 	$save = $crud->save_user();
 	if($save)
@@ -33,12 +43,27 @@ if($action == 'delete_user'){
 	if($save)
 		echo $save;
 }
+if($action == "save_notice"){
+	$save = $crud->save_notice();
+	if($save)
+		echo $save;
+}
+if($action == "delete_notice"){
+	$save = $crud->delete_notice();
+	if($save)
+		echo $save;
+}
+if($action == "save_bmi"){
+	$save = $crud->save_bmi();
+	if($save)
+		echo $save;
+}
 if($action == 'signup'){
 	$save = $crud->signup();
 	if($save)
 		echo $save;
 }
-if($action == 'up	e_account'){
+if($action == 'update_account'){
 	$save = $crud->update_account();
 	if($save)
 		echo $save;
@@ -147,6 +172,26 @@ if($action == "get_registered_members"){
 	$get = $crud->get_registered_members();
 	if($get)
 		echo $get;
+}
+if($action == "update_member_profile"){
+	$save = $crud->update_member_profile();
+	if($save)
+		echo $save;
+}
+if($action == "request_workout"){
+	$save = $crud->request_workout();
+	if($save)
+		echo $save;
+}
+if($action == 'assign_workout'){
+	$save = $crud->assign_workout();
+	if($save)
+		echo $save;
+}
+if($action == 'remove_workout'){
+	$save = $crud->remove_workout();
+	if($save)
+		echo $save;
 }
 
 ob_end_flush();

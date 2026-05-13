@@ -10,11 +10,16 @@
  	
 
 <?php
-  if(!isset($_SESSION['login_id']))
-    header('location:login.php');
- include('./header.php'); 
- // include('./auth.php'); 
- ?>
+  if(!isset($_SESSION['login_id'])){
+    if(isset($_GET['admin'])){
+      header('location:lifeline_hq.php');
+    }else{
+      header('location:login.php');
+    }
+    exit;
+  }
+  include('./header.php'); 
+?>
 
 </head>
 <body>

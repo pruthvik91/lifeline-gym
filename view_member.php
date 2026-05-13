@@ -3,39 +3,69 @@ session_start();
 include 'db_connect.php';
 $wa_token = '';
 global $pdoconn;
-$wa_result = $pdoconn->prepare("SELECT wa_token,contact_number FROM whatsapp_token where user_id =:user_id AND status=1");
-$wa_result->execute(array(':user_id' => $_SESSION['login_id']));
-$wa_rows = $wa_result->fetchAll(PDO::FETCH_OBJ);
-$wa_rowcount = count($wa_rows);
-if ($wa_rowcount > 0) {
-  foreach ($wa_rows as $wa_row) {
-    $wa_token = $wa_row->wa_token;
-    $contact_number = $wa_row->contact_number;
+if (isset($_SESSION['login_id'])) {
+  $wa_result = $pdoconn->prepare("SELECT wa_token,contact_number FROM whatsapp_token where user_id =:user_id AND status=1");
+  $wa_result->execute(array(':user_id' => $_SESSION['login_id']));
+  $wa_rows = $wa_result->fetchAll(PDO::FETCH_OBJ);
+  $wa_rowcount = count($wa_rows);
+  if ($wa_rowcount > 0) {
+    foreach ($wa_rows as $wa_row) {
+      $wa_token = $wa_row->wa_token;
+      $contact_number = $wa_row->contact_number;
+    }
   }
 } ?>
 
 <style>
-    #htmlContent {
+    .receipt-body-container {
         background: white;
-        padding: 50px;
         font-family: 'Plus Jakarta Sans', sans-serif;
         color: #1e293b;
-        width: 800px; /* Standard desktop width */
         margin: 0 auto;
-        min-height: 1123px;
-        box-shadow: 0 0 40px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
     }
+
+    /* WIDE VIEW: Default/Admin/Download */
+    .wide-view {
+        width: 800px;
+        padding: 60px;
+        min-height: 1123px;
+    }
+    .wide-view .bill-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+    }
+    .wide-view .receipt-details th { padding: 12px 15px; font-size: 0.75rem; }
+    .wide-view .receipt-details td { padding: 15px; font-size: 0.9rem; }
+    .wide-view .receipt-info h1 { font-size: 2.5rem; }
+
+    /* COMPACT VIEW: Member Preview */
+    .compact-view {
+        width: 100%;
+        max-width: 500px;
+        padding: 30px;
+        min-height: auto;
+    }
+    .compact-view .bill-section {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    .compact-view .receipt-details th { padding: 8px 10px; font-size: 0.6rem; }
+    .compact-view .receipt-details td { padding: 10px; font-size: 0.75rem; }
+    .compact-view .receipt-info h1 { font-size: 1.8rem; }
+    .compact-view .rules-list { grid-template-columns: 1fr; }
 
     .receipt-container-wrapper {
         background: #f8fafc;
-        padding: 20px 0;
+        padding: 20px;
         display: flex;
         flex-direction: column;
         align-items: center;
         width: 100%;
+        border-radius: 1.5rem;
     }
-
-
 
     .receipt-header {
         display: flex;
@@ -67,7 +97,6 @@ if ($wa_rowcount > 0) {
 
     .receipt-info h1 {
         font-weight: 900;
-        font-size: 2.5rem;
         color: #e2e8f0;
         margin-bottom: 0;
         line-height: 1;
@@ -80,9 +109,6 @@ if ($wa_rowcount > 0) {
     }
 
     .bill-section {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 40px;
         margin-bottom: 40px;
     }
 
@@ -117,8 +143,6 @@ if ($wa_rowcount > 0) {
     .receipt-details th {
         text-align: left;
         background: #f8fafc;
-        padding: 12px 15px;
-        font-size: 0.75rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
         color: #64748b;
@@ -127,9 +151,7 @@ if ($wa_rowcount > 0) {
     }
 
     .receipt-details td {
-        padding: 15px;
         border-bottom: 1px solid #f1f5f9;
-        font-size: 0.9rem;
         font-weight: 600;
         color: #334155;
     }
@@ -570,13 +592,13 @@ $receipt_html = ob_get_clean();
 ?>
 
 <div class="container-fluid p-0 receipt-container-wrapper">
-    <div id="htmlContent">
+    <div id="htmlContent" class="receipt-body-container <?php echo isset($_SESSION['login_id']) ? 'wide-view' : 'compact-view' ?>">
         <?php echo $receipt_html; ?>
     </div>
     
     <!-- Hidden Capture Area for Fixed A4 Snapshot -->
     <div id="captureArea">
-        <div id="a4Content">
+        <div id="a4Content" class="receipt-body-container wide-view">
             <?php echo $receipt_html; ?>
         </div>
     </div>
@@ -590,9 +612,11 @@ $receipt_html = ob_get_clean();
         <button id="download" class="btn-receipt btn-download" onclick="downloadInvoice()">
             <i class="fas fa-download"></i> Download PDF
         </button>
+        <?php if(isset($_SESSION['login_id'])): ?>
         <button id="whatsapp_send" class="btn-receipt btn-whatsapp">
             <i class="fab fa-whatsapp"></i> Send on WhatsApp
         </button>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -638,10 +662,10 @@ $receipt_html = ob_get_clean();
       socket.emit('send-media', {
         wa_token: wa_token,
         number: number,
-        user_id: <?php echo $_SESSION["login_id"]; ?>,
+        user_id: <?php echo $_SESSION["login_id"] ?? 0; ?>,
         inv_id: invoice_id,
         from_number: "receipt",
-        message: message,
+        message: `<?php echo $message ?? ''; ?>`,
         base64Data: base64PDF,
         mimeType: "image/jpeg",
         filename: "receipt.jpg"

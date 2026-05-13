@@ -91,7 +91,7 @@ class Action
 		}
 		setcookie('gym_user', '', time() - 3600, "/");
 		setcookie('gym_pass', '', time() - 3600, "/");
-		header("location:login.php");
+		header("location:lifeline_hq.php");
 	}
 	function logout2()
 	{
@@ -100,6 +100,132 @@ class Action
 			unset($_SESSION[$key]);
 		}
 		header("location:../index.php");
+	}
+	function member_login()
+	{
+		extract($_POST);
+		$qry = $this->db->query("SELECT * FROM members where member_id = '" . $member_id . "' and contact = '" . $contact . "' ");
+		if ($qry->num_rows > 0) {
+			$res = $qry->fetch_array();
+			$_SESSION['member_id'] = $res['id'];
+			$_SESSION['member_name'] = $res['firstname'] . ' ' . $res['lastname'];
+			$_SESSION['member_mid'] = $res['member_id'];
+
+			if (isset($remember)) {
+				setcookie('member_mid', $member_id, time() + (86400 * 30), "/");
+				setcookie('member_phn', $contact, time() + (86400 * 30), "/");
+			} else {
+				setcookie('member_mid', '', time() - 3600, "/");
+				setcookie('member_phn', '', time() - 3600, "/");
+			}
+			return 1;
+		} else {
+			return 3;
+		}
+	}
+	function member_logout()
+	{
+		session_destroy();
+		foreach ($_SESSION as $key => $value) {
+			unset($_SESSION[$key]);
+		}
+		setcookie('member_mid', '', time() - 3600, "/");
+		setcookie('member_phn', '', time() - 3600, "/");
+		header("location:index.php");
+	}
+
+	function save_bmi()
+	{
+		extract($_POST);
+		$bmi = $weight / (($height / 100) * ($height / 100));
+		$bmi = round($bmi, 2);
+		$data = " member_id = '$member_id' ";
+		$data .= ", weight = '$weight' ";
+		$data .= ", height = '$height' ";
+		$data .= ", bmi = '$bmi' ";
+		
+		$save = $this->db->query("INSERT INTO member_bmi_logs SET ".$data);
+		if($save)
+			return 1;
+	}
+
+	function save_notice()
+	{
+		extract($_POST);
+		$data = " title = '$title' ";
+		$data .= ", content = '$content' ";
+		$data .= ", border_color = '$border_color' ";
+		
+		if (empty($id)) {
+			$save = $this->db->query("INSERT INTO gym_notices set " . $data);
+		} else {
+			$save = $this->db->query("UPDATE gym_notices set " . $data . " where id=" . $id);
+		}
+		if ($save)
+			return 1;
+	}
+
+	function delete_notice()
+	{
+		extract($_POST);
+		$delete = $this->db->query("DELETE FROM gym_notices where id = " . $id);
+		if ($delete)
+			return 1;
+	}
+
+	function update_member_profile()
+	{
+		extract($_POST);
+		$data = "";
+		if($_FILES['img']['tmp_name'] != ''){
+			$fname = strtotime(date('y-m-d H:i')).'_'.$_FILES['img']['name'];
+			$move = move_uploaded_file($_FILES['img']['tmp_name'],'assets/uploads/'. $fname);
+			$data .= " profile_pic = '$fname' ";
+		}
+		
+		if($data != ''){
+			$save = $this->db->query("UPDATE members set $data where id = $id");
+			if($save)
+				return 1;
+		}
+		return 2;
+	}
+
+	function request_workout()
+	{
+		extract($_POST);
+		$chk = $this->db->query("SELECT * FROM member_workouts WHERE member_id = $member_id AND status = 0");
+		if($chk->num_rows > 0)
+			return 2; // Already has a pending request
+		
+		$save = $this->db->query("INSERT INTO member_workouts SET member_id = $member_id");
+		if($save)
+			return 1;
+	}
+
+	function assign_workout()
+	{
+		extract($_POST);
+		$data = " status = 1 ";
+		$data .= ", date_assigned = NOW() ";
+		
+		if($_FILES['img']['tmp_name'] != ''){
+			$fname = strtotime(date('y-m-d H:i')).'_'.$_FILES['img']['name'];
+			$move = move_uploaded_file($_FILES['img']['tmp_name'],'assets/uploads/'. $fname);
+			$data .= ", file_path = '$fname' ";
+		}
+		
+		$save = $this->db->query("UPDATE member_workouts SET $data WHERE id = $id");
+		if($save)
+			return 1;
+	}
+
+	function remove_workout()
+	{
+		extract($_POST);
+		$save = $this->db->query("UPDATE member_workouts SET status = 0, file_path = '', date_assigned = NULL WHERE id = $id");
+		if($save)
+			return 1;
 	}
 
 	function save_user()
@@ -556,7 +682,7 @@ class Action
 
 	function get_registered_members()
 	{
-		$qry = $this->db->query("SELECT r.*,p.plan,pp.package,concat(m.firstname,' ',m.lastname) as name,r.member_id, m.profile_pic from registration_info r inner join members m on m.id = r.member_id inner join plans p on p.id = r.plan_id inner join packages pp on pp.id = r.package_id where r.status = 1 order by r.id desc");
+		$qry = $this->db->query("SELECT r.*, p.plan, pp.package, concat(m.firstname,' ',m.lastname) as name, m.contact as contact, m.member_id as member_id, m.profile_pic from registration_info r inner join members m on m.id = r.member_id inner join plans p on p.id = r.plan_id inner join packages pp on pp.id = r.package_id where r.status = 1 order by r.id desc");
 		$data = array();
 		while ($row = $qry->fetch_assoc()) {
 			$row['name'] = ucwords($row['name']);
