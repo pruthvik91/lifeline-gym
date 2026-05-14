@@ -178,7 +178,7 @@
                     "className": "text-end pe-4",
                     "render": function (data, type, row) {
                         return '<div class="d-flex align-items-center justify-content-end gap-2">' +
-                                    '<button class="action-btn view_member" title="View Details" data-id="' + row.member_db_id + '" style="background: #f0fdf4; color: #166534;"><i class="fas fa-info-circle"></i></button>' +
+                                    '<button class="action-btn view_member" title="View Details" data-id="' + data + '" style="background: #f0fdf4; color: #166534;"><i class="fas fa-info-circle"></i></button>' +
                                     '<button class="action-btn view__member" title="Generate Receipt" data-id="' + row.member_db_id + '" style="background: #eef2ff; color: #4338ca;"><i class="fas fa-file-invoice-dollar"></i></button>' +
                                 '</div>';
                     }
