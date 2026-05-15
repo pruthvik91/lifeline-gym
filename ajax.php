@@ -193,5 +193,10 @@ if($action == 'remove_workout'){
 	if($save)
 		echo $save;
 }
+if($action == 'clear_logs'){
+	$save = $crud->clear_logs();
+	if($save)
+		echo $save;
+}
 
 ob_end_flush();

@@ -2,7 +2,7 @@
 session_start();
 include('./db_connect.php');
 if(!isset($_SESSION['member_id']))
-    header("location:login.php");
+    header("location:login");
 
 $member_id = $_SESSION['member_id'];
 $query = $conn->query("SELECT r.*, p.plan, pp.package, m.firstname, m.lastname, m.middlename, m.member_id as mid, m.email, m.contact, m.profile_pic, m.address 
@@ -598,9 +598,31 @@ if($data && isset($data['end_date'])){
                         ?>
                             <img src="assets/uploads/<?php echo $aw['file_path'] ?>" class="img-fluid rounded-4 shadow-sm mb-4" onclick="viewer_modal('assets/uploads/<?php echo $aw['file_path'] ?>')">
                         <?php elseif($ext == 'pdf'): ?>
-                            <div class="pdf-container mb-4 rounded-4 overflow-hidden border border-slate-100 shadow-sm" style="height: 400px;">
-                                <iframe src="assets/uploads/<?php echo $aw['file_path'] ?>" width="100%" height="100%" frameborder="0"></iframe>
+                            <div class="workout-pdf-viewer mb-4">
+                                <div class="d-flex align-items-center justify-content-between p-3 bg-slate-50 border border-bottom-0 rounded-top-4">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="bg-danger-light text-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                            <i class="fas fa-file-pdf small"></i>
+                                        </div>
+                                        <span class="fw-800 text-slate-700 small text-truncate" style="max-width: 120px;">Workout_Plan.pdf</span>
+                                    </div>
+                                    <div class="d-flex gap-1 gap-md-2">
+                                        <button class="btn btn-white btn-sm border shadow-xs rounded-pill px-2 px-md-3 fw-700 text-slate-600" onclick="viewer_modal('assets/uploads/<?php echo $aw['file_path'] ?>', 'pdf')">
+                                            <i class="fas fa-expand me-md-1"></i> <span class="d-none d-sm-inline">Full Screen</span>
+                                        </button>
+                                        <a href="assets/uploads/<?php echo $aw['file_path'] ?>" target="_blank" class="btn btn-white btn-sm border shadow-xs rounded-pill px-2 px-md-3 fw-700 text-slate-600">
+                                            <i class="fas fa-external-link-alt me-md-1"></i> <span class="d-none d-sm-inline">New Tab</span>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="pdf-container rounded-bottom-4 overflow-hidden border border-slate-100 shadow-sm pdf-viewer-responsive">
+                                    <iframe src="assets/uploads/<?php echo $aw['file_path'] ?>#toolbar=0&navpanes=0&scrollbar=0" width="100%" height="100%" frameborder="0"></iframe>
+                                </div>
                             </div>
+                            <style>
+                                .pdf-viewer-responsive { height: 450px; }
+                                @media (max-width: 768px) { .pdf-viewer-responsive { height: 350px; } }
+                            </style>
                         <?php endif; ?>
 
                         <div class="d-grid gap-2">

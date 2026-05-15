@@ -24,7 +24,7 @@ ob_end_flush();
 <?php include('./header.php'); ?>
 <?php 
 if(isset($_SESSION['login_id']))
-header("location:index.php?page=home");
+header("location:admin-home");
 
 ?>
  <script src="https://kit.fontawesome.com/a076d05399.js"></script>
@@ -80,7 +80,7 @@ header("location:index.php?page=home");
 			},
 			success:function(resp){
 				if(resp == 1){
-					location.href ='index.php?page=home';
+					location.href ='admin-home';
 				}else{
 					$('#login-form').prepend('<div class="alert alert-danger">Username or password is incorrect.</div>')
 					$('#login-form button[type="button"]').removeAttr('disabled').html('Login');

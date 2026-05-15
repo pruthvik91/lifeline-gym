@@ -79,7 +79,7 @@
     <button class="mobile-menu-toggle d-none" onclick="$('#sidebar').toggleClass('mobile-open')">
         <i class="fas fa-bars"></i>
     </button>
-    <div class="ms-auto">
+    <div class="ml-auto">
         <div class="dropdown">
             <button class="user-dropdown-btn dropdown-toggle" type="button" id="userMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <div class="user-avatar-small">

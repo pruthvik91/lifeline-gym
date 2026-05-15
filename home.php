@@ -81,7 +81,7 @@
             <div class="h-100">
                 <div class="d-flex align-items-center justify-content-between mb-4">
                     <h5 class="fw-900 text-slate-900 mb-0">Recent Activity</h5>
-                    <a href="index.php?page=members" class="text-primary fw-800 extra-small text-decoration-none">VIEW DIRECTORY</a>
+                    <a href="admin-members" class="text-primary fw-800 extra-small text-decoration-none">VIEW DIRECTORY</a>
                 </div>
                 <div class="bg-white rounded-4 border border-slate-100 shadow-sm overflow-hidden">
                     <div class="list-group list-group-flush">
@@ -149,7 +149,7 @@
                                 <h6 class="fw-800 mb-1">Accelerate Growth</h6>
                                 <p class="extra-small fw-600 opacity-75 mb-0">Ready to onboard a new premium member?</p>
                             </div>
-                            <button class="btn btn-white-minimal fw-800 extra-small px-4 shadow-sm" onclick="location.href='index.php?page=members'">
+                            <button class="btn btn-white-minimal fw-800 extra-small px-4 shadow-sm" onclick="location.href='admin-members'">
                                 ADD NEW MEMBER
                             </button>
                         </div>

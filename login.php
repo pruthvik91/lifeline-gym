@@ -16,7 +16,7 @@ if(!isset($_SESSION['member_id']) && isset($_COOKIE['member_mid']) && isset($_CO
 }
 
 if(isset($_SESSION['member_id']))
-    header("location:member_dashboard.php");
+    header("location:member_dashboard");
 
 $pre_mid = isset($_GET['mid']) ? $_GET['mid'] : (isset($_COOKIE['member_mid']) ? $_COOKIE['member_mid'] : '');
 $pre_phn = isset($_GET['phn']) ? $_GET['phn'] : (isset($_COOKIE['member_phn']) ? $_COOKIE['member_phn'] : '');
@@ -27,6 +27,8 @@ $pre_phn = isset($_GET['phn']) ? $_GET['phn'] : (isset($_COOKIE['member_phn']) ?
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Member Login | Lifeline Gym</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4f46e5">
     <link rel="icon" href="assets/img/logo.png" type="image/png">
     <link rel="apple-touch-icon" href="assets/img/logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -53,7 +55,9 @@ $pre_phn = isset($_GET['phn']) ? $_GET['phn'] : (isset($_COOKIE['member_phn']) ?
             align-items: center;
             justify-content: center;
             margin: 0;
-            overflow: hidden;
+            padding: 2rem 1rem;
+            box-sizing: border-box;
+            overflow-x: hidden;
         }
 
         .login-bg {
@@ -259,8 +263,62 @@ $pre_phn = isset($_GET['phn']) ? $_GET['phn'] : (isset($_COOKIE['member_phn']) ?
         </div>
     </div>
 
+    <!-- PWA Install Prompt -->
+    <div id="pwa-install-banner" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: white; padding: 1.5rem; border-radius: 1.5rem; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.2); z-index: 9999; text-align: center; border: 1px solid var(--slate-100);">
+        <button id="pwa-close" style="position: absolute; top: 10px; right: 15px; background: transparent; border: none; font-size: 1.2rem; color: var(--slate-400); cursor: pointer;"><i class="fas fa-times"></i></button>
+        <img src="assets/img/logo.png" alt="Logo" style="width: 50px; height: 50px; border-radius: 12px; margin-bottom: 10px;">
+        <h4 style="font-size: 1.1rem; font-weight: 800; color: var(--slate-900); margin-bottom: 5px;">Install Lifeline Gym App</h4>
+        <p style="font-size: 0.85rem; color: var(--slate-500); margin-bottom: 15px;">Add to your home screen for quick and easy access to your membership portal.</p>
+        <button id="pwa-install-btn" style="width: 100%; padding: 0.9rem; background: var(--primary); color: white; border: none; border-radius: 1rem; font-weight: 700; font-size: 0.95rem; cursor: pointer; box-shadow: 0 10px 20px -10px rgba(79, 70, 229, 0.4);">Install App</button>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+        // PWA Installation Logic
+        let deferredPrompt;
+        const installBanner = document.getElementById('pwa-install-banner');
+        const installBtn = document.getElementById('pwa-install-btn');
+        const closeBtn = document.getElementById('pwa-close');
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                .then(registration => {
+                    console.log('ServiceWorker registration successful');
+                })
+                .catch(err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            setTimeout(() => {
+                installBanner.style.display = 'block';
+            }, 1000); 
+        });
+
+        installBtn.addEventListener('click', async () => {
+            installBanner.style.display = 'none';
+            if(deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`User response to the install prompt: ${outcome}`);
+                deferredPrompt = null;
+            }
+        });
+
+        closeBtn.addEventListener('click', () => {
+            installBanner.style.display = 'none';
+        });
+
+        window.addEventListener('appinstalled', (evt) => {
+            installBanner.style.display = 'none';
+            console.log('App installed');
+        });
+
         $('#member-login-form').submit(function(e){
             e.preventDefault()
             $('#msg').html('')
@@ -276,7 +334,7 @@ $pre_phn = isset($_GET['phn']) ? $_GET['phn'] : (isset($_COOKIE['member_phn']) ?
                 },
                 success: function(resp){
                     if(resp == 1){
-                        location.href = 'member_dashboard.php';
+                        location.href = 'member_dashboard';
                     }else{
                         $('#msg').html('<div class="alert"><i class="fas fa-exclamation-circle me-2"></i>Invalid ID or Phone number.</div>')
                         $('.btn-access').removeAttr('disabled').html('<span>Sign In</span> <i class="fas fa-arrow-right"></i>')

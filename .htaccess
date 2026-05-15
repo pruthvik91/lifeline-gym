@@ -1,0 +1,26 @@
+Options -MultiViews
+RewriteEngine On
+RewriteBase /
+
+# Admin Panel Clean URLs
+RewriteRule ^admin-([a-zA-Z0-9_-]+)$ index.php?page=$1 [L,QSA]
+
+# Redirect explicit .php requests to extension-less version (except ajax.php)
+RewriteCond %{ENV:REDIRECT_STATUS} ^$
+RewriteCond %{REQUEST_METHOD} GET [NC]
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s([^.]+)\.php [NC]
+RewriteCond %{REQUEST_URI} !ajax\.php [NC]
+RewriteRule ^ %1 [R=301,L]
+
+# Internally map extension-less URLs back to .php files
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^(.*)$ $1.php [L]
+
+# Force HTTPS (optional but recommended for live site)
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Custom 404 Error Page
+ErrorDocument 404 /404.php
