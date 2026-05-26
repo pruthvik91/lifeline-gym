@@ -381,7 +381,7 @@ $wp = "wp"; // Action, should be 'send'
                     if (strtotime(date('Y-m-d')) <= strtotime($row['end_date'])) :
                         $days_remaining = ceil((strtotime($row['end_date']) - strtotime(date('Y-m-d'))) / (60 * 60 * 24));
                         if ($days_remaining > 5) :
-                            $sql = "SELECT * FROM payments where member_id = $id order by id desc limit 1";
+                            $sql = "SELECT * FROM payments where registration_id = {$row['id']} order by id desc limit 1";
                             $result = $conn->query($sql);
                             if ($result->num_rows > 0) {
                                 while ($payment = $result->fetch_assoc()) {

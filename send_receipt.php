@@ -317,25 +317,28 @@ if (!empty($id)) {
     <?php
     $reg = $conn->query("SELECT r.* FROM registration_info r where r.member_id = $id order by id desc limit 1 ")->fetch_assoc();
     $is_expired = false;
+    $has_payment = false;
     if ($reg) {
         $today = strtotime(date('Y-m-d'));
         $expiry = strtotime($reg['end_date']);
         $is_expired = ($today > $expiry) || ($reg['status'] == 0);
+        
+        $p_sql = "SELECT * FROM payments where registration_id = {$reg['id']} order by id desc limit 1";
+        $p_res = $conn->query($p_sql);
+        $has_payment = $p_res->num_rows > 0;
     }
     ?>
-    <div class="payment-summary <?php echo $is_expired ? 'pending' : 'paid' ?>">
+    <div class="payment-summary <?php echo ($is_expired || !$has_payment) ? 'pending' : 'paid' ?>">
         <div class="payment-status">
             <?php if (!$is_expired) : 
-                $p_sql = "SELECT * FROM payments where member_id = $id order by id desc limit 1";
-                $p_res = $conn->query($p_sql);
-                if ($p_res->num_rows > 0) {
+                if ($has_payment) {
                     $p_row = $p_res->fetch_assoc();
                     echo "<div class='payment-badge-success'>FEES PAID</div>";
                     echo "<h4 class='fw-800'>₹" . number_format($p_row["amount"]) . "</h4>";
                     echo "<p class='mb-0 text-muted'>Received via " . $p_row["remarks"] . "</p>";
                 } else {
-                    echo "<div class='payment-badge-success'>FEES PAID</div>";
-                    echo "<h4 class='fw-800'>Payment Verified</h4><p class='mb-0 text-muted'>Subscription active</p>";
+                    echo "<div class='payment-badge-danger'>FEES PENDING</div>";
+                    echo "<h4 class='fw-800'>Payment Pending</h4><p class='mb-0 text-muted'>No recent payment found for this subscription.</p>";
                 }
             else : ?>
                 <div class='payment-badge-danger'>FEES PENDING</div>

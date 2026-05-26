@@ -24,7 +24,7 @@ $is_currently_paused = ($data && isset($data['is_paused']) && $data['is_paused']
 if($data && isset($data['end_date'])){
     if ($is_currently_paused) {
         $unused_days = ceil((strtotime($data['resume_date']) - time()) / (60 * 60 * 24));
-        $end = strtotime($data['end_date']);
+        $end = strtotime($data['end_date'] . ' 23:59:59');
         $diff = $end - time();
         $days_left = ceil($diff / (60 * 60 * 24)) - $unused_days;
         if ($days_left < 0) $days_left = 0;
@@ -32,7 +32,7 @@ if($data && isset($data['end_date'])){
         $status = 'Paused';
         $status_class = 'status-warning';
     } else {
-        $end = strtotime($data['end_date']);
+        $end = strtotime($data['end_date'] . ' 23:59:59');
         $now = time();
         $diff = $end - $now;
         $days_left = ceil($diff / (60 * 60 * 24));
