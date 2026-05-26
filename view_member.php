@@ -526,35 +526,34 @@ ob_start();
         <?php
         $paid = $conn->query("SELECT r.*,pl.plan,pa.package FROM registration_info r inner join plans pl on pl.id = r.plan_id inner join packages pa on pa.id = r.package_id where r.member_id = $id order by id desc limit 1 ");
         $row = $paid->fetch_assoc();
+        $has_payment = false;
         if ($row) {
             $today = strtotime(date('Y-m-d'));
             $expiry = strtotime($row['end_date']);
             $is_expired = ($today > $expiry) || ($row['status'] == 0);
+            
+            $payment_result = $conn->query("SELECT * FROM payments where member_id = '$member_id' order by id desc limit 1");
+            $has_payment = $payment_result->num_rows > 0;
         }
         ?>
-        <div class="payment-summary <?php echo $is_expired ? 'pending' : 'paid' ?>">
+        <div class="payment-summary <?php echo ($is_expired || !$has_payment) ? 'pending' : 'paid' ?>">
             <div class="payment-status">
                 <?php
                 if ($row) :
-                    $today = strtotime(date('Y-m-d'));
-                    $expiry = strtotime($row['end_date']);
                     if (!$is_expired) :
-                        // If NOT expired, show PAID amount
-                        $sql = "SELECT * FROM payments where member_id = $id order by id desc limit 1";
-                        $result = $conn->query($sql);
-                        if ($result->num_rows > 0) {
-                            while ($p_row = $result->fetch_assoc()) {
+                        if ($has_payment) {
+                            while ($p_row = $payment_result->fetch_assoc()) {
                                 echo "<div class='payment-badge-success'>FEES PAID</div>";
                                 echo "<h4>₹" . number_format($p_row["amount"]) . "</h4>";
                                 echo "<p class='mb-0 text-slate-500'>Received via " . $p_row["remarks"] . " on " . date('d M, Y', strtotime($p_row['date_created'])) . "</p>";
                             }
                         } else {
-                            echo "<div class='payment-badge-success'>FEES PAID</div>";
-                            echo "<h4>Payment Verified</h4><p class='mb-0 text-slate-500'>Your subscription is active until " . date('d M, Y', $expiry) . "</p>";
+                            echo "<div class='payment-badge-danger'>FEES PENDING</div>";
+                            echo "<h4>Payment Pending</h4><p class='mb-0 text-slate-500'>No recent payment found for this subscription.</p>";
                         }
                     else :
-                        // If EXPIRED, show PENDING
-                        echo "<div class='payment-badge-danger'>FEES PENDING</div>";
+                        // If EXPIRED, show EXPIRED
+                        echo "<div class='payment-badge-danger'>EXPIRED</div>";
                         echo "<h4>MEMBERSHIP EXPIRED</h4><p class='mb-0 text-slate-500'>Please renew your plan to continue services and avoid interruption.</p>";
                     endif;
                 endif;

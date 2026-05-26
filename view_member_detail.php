@@ -159,10 +159,14 @@ if (isset($_GET['id'])) {
         
         <div class="col-md-8">
             <h6 class="fw-800 text-slate-900 mb-3 px-2">Active Membership</h6>
-            <?php
             $paid = $conn->query("SELECT r.*,pl.plan,pa.package FROM registration_info r inner join plans pl on pl.id = r.plan_id inner join packages pa on pa.id = r.package_id where r.member_id = $id order by id desc limit 1");
             if($row = $paid->fetch_assoc()):
+                $is_currently_paused = ($row['is_paused'] == 1 && $row['resume_date'] && strtotime(date('Y-m-d')) < strtotime($row['resume_date']));
                 $days_remaining = ceil((strtotime($row['end_date']) - time()) / (60 * 60 * 24));
+                if($is_currently_paused) {
+                    $unused_days = ceil((strtotime($row['resume_date']) - time()) / (60 * 60 * 24));
+                    $days_remaining = $days_remaining - $unused_days;
+                }
             ?>
                 <div class="membership-card">
                     <div class="d-flex justify-content-between align-items-start mb-4">
@@ -189,11 +193,17 @@ if (isset($_GET['id'])) {
                             <i class="fas fa-hourglass-half"></i>
                             <span class="fw-700"><?php echo max(0, $days_remaining) ?> Days Remaining</span>
                         </div>
-                        <?php if($days_remaining > 0): ?>
-                            <span class="badge bg-white text-primary rounded-pill px-3">Active</span>
-                        <?php else: ?>
-                            <span class="badge bg-danger text-white rounded-pill px-3">Expired</span>
-                        <?php endif; ?>
+                        <div class="d-flex gap-2 align-items-center">
+                            <?php if($is_currently_paused): ?>
+                                <button class="btn btn-sm btn-light fw-700 rounded-pill px-3 text-dark" onclick="resume_membership(<?php echo $row['id'] ?>)">Resume Early</button>
+                                <span class="badge bg-warning text-dark rounded-pill px-3">Paused</span>
+                            <?php elseif($days_remaining > 0): ?>
+                                <button class="btn btn-sm btn-light fw-700 rounded-pill px-3 text-dark" onclick="pause_membership(<?php echo $row['id'] ?>)">Pause</button>
+                                <span class="badge bg-white text-primary rounded-pill px-3">Active</span>
+                            <?php else: ?>
+                                <span class="badge bg-danger text-white rounded-pill px-3">Expired</span>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
                 
@@ -219,3 +229,26 @@ if (isset($_GET['id'])) {
         </div>
     </div>
 </div>
+
+<script>
+    function pause_membership(rid) {
+        uni_modal('Pause Membership', 'pause_plan.php?rid=' + rid, 'small');
+    }
+
+    function resume_membership(rid) {
+        if(confirm("Resume Membership Early?\nThe member's expiration date will be adjusted to refund the unused paused days.")) {
+            start_load();
+            $.ajax({
+                url:'ajax.php?action=resume_membership',
+                method:'POST',
+                data:{rid:rid},
+                success:function(resp){
+                    if(resp == 1){
+                        alert_toast('Membership is now active again.', 'success');
+                        setTimeout(function(){ location.reload() }, 750);
+                    }
+                }
+            });
+        }
+    }
+</script>

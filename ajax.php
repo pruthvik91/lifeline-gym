@@ -163,6 +163,16 @@ if($action == "save_membership"){
 	if($save)
 		echo $save;
 }	
+if($action == "pause_membership"){
+	$save = $crud->pause_membership();
+	if($save)
+		echo $save;
+}
+if($action == "resume_membership"){
+	$save = $crud->resume_membership();
+	if($save)
+		echo $save;
+}
 if($action == "get_members"){
 	$get = $crud->get_members();
 	if($get)

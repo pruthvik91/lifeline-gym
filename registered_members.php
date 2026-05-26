@@ -133,7 +133,7 @@
                                     '<div class="athlete-avatar">' + avatar_content + '</div>' +
                                     '<div>' +
                                         '<div class="fw-700 text-slate-900">' + data + '</div>' +
-                                        '<div class="small text-slate-400 fw-600">ID: ' + row.m_id_str + '</div>' +
+                                        '<div class="small text-slate-400 fw-600">ID: ' + row.member_id + '</div>' +
                                     '</div>' +
                                 '</div>';
                     }
@@ -159,7 +159,22 @@
                 { 
                     "data": "end_date",
                     "className": "text-center",
-                    "render": function (data) {
+                    "render": function (data, type, row) {
+                        var is_currently_paused = (row.is_paused == 1 && row.resume_date && moment().isBefore(moment(row.resume_date), 'day'));
+                        
+                        if (type === 'sort' || type === 'type') {
+                            var end = moment(data);
+                            if (is_currently_paused) {
+                                return 0;
+                            }
+                            return end.diff(moment(), 'days');
+                        }
+
+                        if (is_currently_paused) {
+                            var resume_date = moment(row.resume_date);
+                            return '<div class="validity-badge" style="background:#fef3c7; color:#92400e;"><i class="fas fa-pause-circle me-1"></i> Paused til ' + resume_date.format('MMM D') + ' <span class="d-none">status-paused</span></div>';
+                        }
+
                         var end = moment(data);
                         var now = moment();
                         var diff = end.diff(now, 'days');

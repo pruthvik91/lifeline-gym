@@ -672,6 +672,43 @@ class Action
 		}
 	}
 
+	function pause_membership()
+	{
+		extract($_POST);
+		$pause_days = (int)$pause_days;
+		$info = $this->db->query("SELECT * FROM registration_info where id = $rid")->fetch_array();
+		if ($info && $pause_days > 0) {
+			$new_end_date = date("Y-m-d", strtotime($info['end_date'] . " + $pause_days days"));
+			$resume_date = date("Y-m-d", strtotime("+$pause_days days"));
+			$update = $this->db->query("UPDATE registration_info set is_paused = 1, pause_date = CURRENT_DATE(), resume_date = '$resume_date', end_date = '$new_end_date' where id = " . $rid);
+			if ($update) {
+				return 1;
+			}
+		}
+		return 0;
+	}
+
+	function resume_membership()
+	{
+		extract($_POST);
+		$info = $this->db->query("SELECT * FROM registration_info where id = $rid")->fetch_array();
+		if ($info && $info['is_paused'] == 1) {
+			$today = date('Y-m-d');
+			$resume_date = $info['resume_date'];
+			if ($resume_date && strtotime($today) < strtotime($resume_date)) {
+			    // manually resumed early, refund unused days
+			    $unused_days = floor((strtotime($resume_date) - strtotime($today)) / (60 * 60 * 24));
+			    $new_end_date = date("Y-m-d", strtotime($info['end_date'] . " - $unused_days days"));
+			    $update = $this->db->query("UPDATE registration_info set is_paused = 0, pause_date = NULL, resume_date = NULL, end_date = '$new_end_date' where id = " . $rid);
+			} else {
+			    // auto-resumed or unused
+			    $update = $this->db->query("UPDATE registration_info set is_paused = 0, pause_date = NULL, resume_date = NULL where id = " . $rid);
+			}
+			return 1;
+		}
+		return 0;
+	}
+
 	function get_members()
 	{
 		$qry = $this->db->query("SELECT *, concat(firstname,' ',lastname,' ',middlename) as name FROM members ORDER BY id ASC");

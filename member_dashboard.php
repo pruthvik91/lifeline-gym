@@ -19,22 +19,35 @@ $status = 'No Active Plan';
 $status_class = 'status-inactive';
 $days_left = 0;
 
+$is_currently_paused = ($data && isset($data['is_paused']) && $data['is_paused'] == 1 && isset($data['resume_date']) && strtotime(date('Y-m-d')) < strtotime($data['resume_date']));
+
 if($data && isset($data['end_date'])){
-    $end = strtotime($data['end_date']);
-    $now = time();
-    $diff = $end - $now;
-    $days_left = ceil($diff / (60 * 60 * 24));
-    
-    if($days_left > 5){
-        $status = 'Active';
-        $status_class = 'status-active';
-    } elseif($days_left > 0){
-        $status = 'Expiring Soon';
+    if ($is_currently_paused) {
+        $unused_days = ceil((strtotime($data['resume_date']) - time()) / (60 * 60 * 24));
+        $end = strtotime($data['end_date']);
+        $diff = $end - time();
+        $days_left = ceil($diff / (60 * 60 * 24)) - $unused_days;
+        if ($days_left < 0) $days_left = 0;
+        
+        $status = 'Paused';
         $status_class = 'status-warning';
     } else {
-        $status = 'Expired';
-        $status_class = 'status-expired';
-        $days_left = 0;
+        $end = strtotime($data['end_date']);
+        $now = time();
+        $diff = $end - $now;
+        $days_left = ceil($diff / (60 * 60 * 24));
+        
+        if($days_left > 5){
+            $status = 'Active';
+            $status_class = 'status-active';
+        } elseif($days_left > 0){
+            $status = 'Expiring Soon';
+            $status_class = 'status-warning';
+        } else {
+            $status = 'Expired';
+            $status_class = 'status-expired';
+            $days_left = 0;
+        }
     }
 }
 ?>
@@ -466,6 +479,15 @@ if($data && isset($data['end_date'])){
             </div>
 
             <div class="section-title">Quick Actions</div>
+            <?php if($is_currently_paused): ?>
+                <div class="notice-card mx-3 mb-4" style="border-left-color: #f59e0b; background: #fffbeb;">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-pause-circle text-warning me-2" style="font-size: 1.2rem;"></i>
+                        <h4 class="mb-0" style="font-size: 0.9rem;">Membership Paused</h4>
+                    </div>
+                    <p class="small mb-2" style="color: #92400e;">Your membership is paused until <b><?php echo date('d M, Y', strtotime($data['resume_date'])) ?></b>. Active days have been frozen until then.</p>
+                </div>
+            <?php endif; ?>
             <div class="action-grid">
                 <a href="javascript:void(0)" class="btn-action btn-blue" id="view_receipt_home">
                     <i class="fas fa-file-invoice-dollar"></i>
