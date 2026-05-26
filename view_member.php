@@ -495,7 +495,7 @@ ob_start();
                 </thead>
                 <tbody>
                     <?php
-                    $paid = $conn->query("SELECT r.*,pl.plan,pa.package FROM registration_info r inner join plans pl on pl.id = r.plan_id inner join packages pa on pa.id = r.package_id where r.member_id = $id order by id desc limit 1");
+                    $paid = $conn->query("SELECT r.*,pl.plan,pl.plan_type,pa.package FROM registration_info r inner join plans pl on pl.id = r.plan_id inner join packages pa on pa.id = r.package_id where r.member_id = $id order by id desc limit 1");
                     while ($row = $paid->fetch_assoc()) :
                     $today = strtotime(date('Y-m-d'));
                     $expiry = strtotime($row['end_date']);
@@ -503,7 +503,7 @@ ob_start();
                     $days_remaining = ceil(($expiry - $today) / (60 * 60 * 24));
                     ?>
                     <tr>
-                        <td><b><?php echo $row['plan'] ?> Months</b> Subscription</td>
+                        <td><b><?php echo $row['plan'] ?> <?php echo isset($row['plan_type']) ? ucfirst($row['plan_type']) : 'Months'; ?></b> Subscription</td>
                         <td><?php echo $row['package'] ?></td>
                         <td><?php echo date("d M, Y", strtotime($row['start_date'])) ?></td>
                         <td style="color: #e11d48;"><?php echo date("d M, Y", $expiry) ?></td>

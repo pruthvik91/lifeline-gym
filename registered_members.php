@@ -138,10 +138,11 @@
                                 '</div>';
                     }
                 },
-                { 
+                {
                     "data": "plan",
-                    "render": function (data) {
-                        return '<div class="fw-700 text-slate-700"><i class="fas fa-calendar-alt me-2 text-slate-300"></i>' + data + ' Months</div>';
+                    "render": function(data, type, row) {
+                        var planType = row.plan_type ? row.plan_type : 'months';
+                        return '<div class="fw-700 text-slate-700"><i class="fas fa-calendar-alt me-2 text-slate-300"></i>' + data + ' ' + planType.charAt(0).toUpperCase() + planType.slice(1) + '</div>';
                     }
                 },
                 { 
@@ -181,7 +182,7 @@
                         var status_class = (diff > 5) ? 'status-active' : ((diff > 0) ? 'status-warning' : 'status-expired');
                         
                         // We include the class name in the text for custom filtering
-                        if (diff > 0) {
+                        if (diff >= 0) {
                             return '<div class="validity-badge ' + status_class + '"><i class="fas fa-hourglass-half me-1"></i> ' + diff + ' days left <span class="d-none">' + status_class + '</span></div>';
                         } else {
                             return '<div class="validity-badge ' + status_class + '"><i class="fas fa-exclamation-circle me-1"></i> Expired <span class="d-none">' + status_class + '</span></div>';

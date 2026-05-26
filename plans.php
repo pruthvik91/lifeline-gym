@@ -12,12 +12,16 @@
                     <div class="card-body p-4">
                         <input type="hidden" name="id">
                         <div class="form-group mb-0">
-                            <label class="form-label fw-700 text-slate-600">Plan Duration (months)</label>
-                            <div class="input-group">
+                            <label class="form-label fw-700 text-slate-600">Plan Duration</label>
+                            <div class="input-group mb-2">
                                 <span class="input-group-text bg-slate-50 border-2 border-end-0 rounded-start-3"><i class="fas fa-calendar-alt text-slate-400"></i></span>
-                                <input type="number" class="form-control border-2 rounded-end-3 py-2" min="1" name="plan" placeholder="Enter number of months">
+                                <input type="number" class="form-control border-2 py-2" min="1" name="plan" placeholder="Duration">
+                                <select name="plan_type" class="form-select border-2 rounded-end-3 py-2" style="max-width: 120px;">
+                                    <option value="months">Months</option>
+                                    <option value="days">Days</option>
+                                </select>
                             </div>
-                            <small class="text-slate-400 mt-2 d-block">Specify the membership duration in months.</small>
+                            <small class="text-slate-400 mt-2 d-block">Specify the membership duration and type (e.g. 15 Days, 1 Month).</small>
                         </div>
                     </div>
                     <div class="card-footer bg-slate-50 border-0 p-4 rounded-bottom-4">
@@ -49,7 +53,7 @@
                             <tbody>
                                 <?php
 								$i = 1;
-								$plan = $conn->query("SELECT * FROM plans order by id asc");
+								$plan = $conn->query("SELECT * FROM plans order by plan_type asc, plan asc");
 								while ($row = $plan->fetch_assoc()) :
 								?>
                                 <tr class="athlete-row">
@@ -63,7 +67,7 @@
                                             </div>
                                             <div>
                                                 <span class="fw-800 text-slate-900 fs-5"><?php echo $row['plan'] ?></span>
-                                                <span class="text-slate-500 fw-600 ms-1">month/s</span>
+                                                <span class="text-slate-500 fw-600 ms-1"><?php echo ucfirst($row['plan_type'] ?? 'months') ?></span>
                                             </div>
                                         </div>
                                     </td>
@@ -72,6 +76,7 @@
                                             <button class="action-btn edit_plan" title="Edit Plan" 
                                                 data-id="<?php echo $row['id'] ?>" 
                                                 data-plan="<?php echo $row['plan'] ?>"
+                                                data-plan_type="<?php echo $row['plan_type'] ?? 'months' ?>"
                                                 style="background: #eef2ff; color: #4338ca;">
                                                 <i class="fas fa-edit"></i>
                                             </button>
@@ -166,6 +171,7 @@
         form.get(0).reset()
         form.find("[name='id']").val($(this).attr('data-id'))
         form.find("[name='plan']").val($(this).attr('data-plan'))
+        form.find("[name='plan_type']").val($(this).attr('data-plan_type'))
         end_load()
         
         if(window.innerWidth < 992) {

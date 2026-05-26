@@ -70,12 +70,12 @@ if (isset($_GET['id'])) {
                 <select name="plan_id" required="required" class="custom-select select2" id="">
                     <option value=""></option>
                     <?php
-                    $qry = $conn->query("SELECT * FROM plans order by plan asc");
+                    $qry = $conn->query("SELECT * FROM plans order by plan_type asc, plan asc");
                     while ($row = $qry->fetch_assoc()) :
                     ?>
                     <option value="<?php echo $row['id'] ?>"
                         <?php echo isset($plan_id) && $plan_id == $row['id'] ? 'selected' : '' ?>>
-                        <?php echo ucwords($row['plan']) ?></option>
+                        <?php echo ucwords($row['plan']) ?> <?php echo isset($row['plan_type']) ? ucfirst($row['plan_type']) : 'Months'; ?></option>
                     <?php endwhile; ?>
                 </select>
             </div>

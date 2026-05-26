@@ -25,12 +25,12 @@ p {
             <select class="form-control" id="plan_id" name="plan_id" required>
                 <option value="">-- Select Plan --</option>
                  <?php
-                $plans = $conn->query("SELECT id, plan FROM plans ORDER BY plan ASC");
+                $plans = $conn->query("SELECT id, plan, plan_type FROM plans ORDER BY plan_type ASC, plan ASC");
                 while ($row = $plans->fetch_assoc()):
                     $selected = ($row['id'] == $current_plan_id) ? 'selected' : '';
                 ?>
                     <option value="<?php echo $row['id'] ?>" <?php echo $selected ?>>
-                        <?php echo htmlspecialchars($row['plan']) ?>
+                        <?php echo htmlspecialchars($row['plan']) ?> <?php echo isset($row['plan_type']) ? ucfirst($row['plan_type']) : 'Months'; ?>
                     </option>
                 <?php endwhile; ?>
             </select>

@@ -38,7 +38,7 @@ if (isset($_GET['id'])) {
         <div class="col-12 col-md-4">
             <div class="p-3 border border-slate-100 rounded-3 h-100">
                 <div class="text-slate-400 extra-small fw-700 text-uppercase mb-1">Current Plan</div>
-                <div class="fw-700 text-slate-800"><?php echo $plan ?> Months</div>
+                <div class="fw-700 text-slate-800"><?php echo $plan ?> <?php echo isset($plan_type) ? ucfirst($plan_type) : 'Months' ?></div>
             </div>
         </div>
         <div class="col-12 col-md-4">

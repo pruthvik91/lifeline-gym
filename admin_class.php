@@ -376,7 +376,9 @@ class Action
 	function save_plan()
 	{
 		extract($_POST);
+		$plan_type = isset($plan_type) ? $plan_type : 'months';
 		$data = " plan = '$plan' ";
+		$data .= ", plan_type = '$plan_type' ";
 		if (empty($id)) {
 			$save = $this->db->query("INSERT INTO plans set $data");
 		} else {
@@ -524,9 +526,11 @@ class Action
 					$move = move_uploaded_file($_FILES['img']['tmp_name'], 'assets/uploads/' . $fname);
 					$data .= ", profile_pic = '$fname' ";
 				}
-				$plan = $this->db->query("SELECT * FROM plans where id = $plan_id")->fetch_array()['plan'];
+				$plan_row = $this->db->query("SELECT * FROM plans where id = $plan_id")->fetch_array();
+				$plan = $plan_row['plan'];
+				$plan_type = isset($plan_row['plan_type']) ? $plan_row['plan_type'] : 'months';
 
-				$data .= ", end_date ='" . date("Y-m-d", strtotime($start_date . ' +' . $plan . ' months')) . "' ";
+				$data .= ", end_date ='" . date("Y-m-d", strtotime($start_date . ' +' . $plan . ' ' . $plan_type)) . "' ";
 				$save = $this->db->query("INSERT INTO registration_info set $data");
 				if (!$save)
 					$this->db->query("DELETE FROM members where id = $member_id");
@@ -630,8 +634,10 @@ class Action
 			}
 		}
 		$data .= ", start_date ='" . $prev['end_date'] . "' ";
-		$plan = $this->db->query("SELECT * FROM plans where id = $new_plan_id")->fetch_array()['plan'];
-		$data .= ", end_date ='" . date("Y-m-d", strtotime($prev['end_date'] . ' +' . $plan . ' months')) . "' ";
+		$plan_row = $this->db->query("SELECT * FROM plans where id = $new_plan_id")->fetch_array();
+		$plan = $plan_row['plan'];
+		$plan_type = isset($plan_row['plan_type']) ? $plan_row['plan_type'] : 'months';
+		$data .= ", end_date ='" . date("Y-m-d", strtotime($prev['end_date'] . ' +' . $plan . ' ' . $plan_type)) . "' ";
 		$save = $this->db->query("INSERT INTO registration_info set $data");
 		if ($save) {
 			$id = $this->db->insert_id;
@@ -662,8 +668,10 @@ class Action
 				$$k = $v;
 			}
 		}
-		$plan = $this->db->query("SELECT * FROM plans where id = $plan_id")->fetch_array()['plan'];
-		$data .= ", end_date ='" . date("Y-m-d", strtotime($start_date . ' +' . $plan . ' months')) . "' ";
+		$plan_row = $this->db->query("SELECT * FROM plans where id = $plan_id")->fetch_array();
+		$plan = $plan_row['plan'];
+		$plan_type = isset($plan_row['plan_type']) ? $plan_row['plan_type'] : 'months';
+		$data .= ", end_date ='" . date("Y-m-d", strtotime($start_date . ' +' . $plan . ' ' . $plan_type)) . "' ";
 		$save = $this->db->query("INSERT INTO registration_info set $data");
 		if ($save) {
 			$id = $this->db->insert_id;
@@ -722,7 +730,7 @@ class Action
 
 	function get_registered_members()
 	{
-		$qry = $this->db->query("SELECT r.*, m.id as member_db_id, p.plan, pp.package, concat(m.firstname,' ',m.lastname) as name, m.contact as contact, m.member_id as member_id, m.profile_pic from registration_info r inner join members m on m.id = r.member_id inner join plans p on p.id = r.plan_id inner join packages pp on pp.id = r.package_id where r.status = 1 order by r.id desc");
+		$qry = $this->db->query("SELECT r.*, m.id as member_db_id, p.plan, p.plan_type, pp.package, concat(m.firstname,' ',m.lastname) as name, m.contact as contact, m.member_id as member_id, m.profile_pic from registration_info r inner join members m on m.id = r.member_id inner join plans p on p.id = r.plan_id inner join packages pp on pp.id = r.package_id where r.status = 1 order by r.id desc");
 		$data = array();
 		while ($row = $qry->fetch_assoc()) {
 			$row['name'] = ucwords($row['name']);
