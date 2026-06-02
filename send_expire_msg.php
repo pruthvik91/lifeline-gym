@@ -94,7 +94,7 @@ if (count($wa_rows) > 0) {
                         $start = isset($_POST['start_date']) ? $_POST['start_date'] : date('Y-m-d');
                         $end = isset($_POST['end_date']) ? $_POST['end_date'] : date('Y-m-d');
                         $members = $conn->query("
-                            SELECT r.*, p.plan, pp.package, CONCAT(m.lastname,' ',m.firstname,' ',m.middlename) AS name, m.contact AS mobile_number
+                            SELECT r.*, p.plan, p.plan_type, pp.package, CONCAT(m.lastname,' ',m.firstname,' ',m.middlename) AS name, m.contact AS mobile_number
                             FROM registration_info r
                             INNER JOIN members m ON m.id = r.member_id
                             INNER JOIN plans p ON p.id = r.plan_id
@@ -125,7 +125,7 @@ if (count($wa_rows) > 0) {
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="fw-700 text-slate-700"><?php echo $row['plan'] . ' Months' ?></div>
+                                    <div class="fw-700 text-slate-700"><?php echo $row['plan'] . ' ' . (isset($row['plan_type']) ? ucfirst($row['plan_type']) : 'Months') ?></div>
                                     <div class="text-slate-400 small fw-500"><?php echo $row['package'] ?></div>
                                 </td>
                                 <td>

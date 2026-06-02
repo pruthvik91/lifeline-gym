@@ -62,7 +62,7 @@
 							<tbody>
 								<?php
 								$i = 1;
-								$member =  $conn->query("SELECT r.*,p.plan,pp.package,concat(m.lastname,' ',m.firstname,' ',m.middlename) as name,r.member_id from registration_info r inner join members m on m.id = r.member_id inner join plans p on p.id = r.plan_id inner join packages pp on pp.id = r.package_id where r.status = 1 order by r.id desc");
+								$member =  $conn->query("SELECT r.*,p.plan,p.plan_type,pp.package,concat(m.lastname,' ',m.firstname,' ',m.middlename) as name,r.member_id from registration_info r inner join members m on m.id = r.member_id inner join plans p on p.id = r.plan_id inner join packages pp on pp.id = r.package_id where r.status = 1 order by r.id desc");
 								while ($row = $member->fetch_assoc()) :
 								?>
 									<tr>
@@ -77,7 +77,7 @@
 
 										</td>
 										<td class="">
-											<p><b><?php echo $row['plan'] . 'Months' ?></b></p>
+											<p><b><?php echo $row['plan'] . ' ' . (isset($row['plan_type']) ? ucfirst($row['plan_type']) : 'Months') ?></b></p>
 										</td>
 										<td class="">
 											<p><b><?php echo $row['package'] ?></b></p>

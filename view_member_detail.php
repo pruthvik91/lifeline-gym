@@ -159,7 +159,8 @@ if (isset($_GET['id'])) {
         
         <div class="col-md-8">
             <h6 class="fw-800 text-slate-900 mb-3 px-2">Active Membership</h6>
-            $paid = $conn->query("SELECT r.*,pl.plan,pa.package FROM registration_info r inner join plans pl on pl.id = r.plan_id inner join packages pa on pa.id = r.package_id where r.member_id = $id order by id desc limit 1");
+            <?php
+            $paid = $conn->query("SELECT r.*,pl.plan,pl.plan_type,pa.package FROM registration_info r inner join plans pl on pl.id = r.plan_id inner join packages pa on pa.id = r.package_id where r.member_id = $id order by id desc limit 1");
             if($row = $paid->fetch_assoc()):
                 $is_currently_paused = ($row['is_paused'] == 1 && $row['resume_date'] && strtotime(date('Y-m-d')) < strtotime($row['resume_date']));
                 $days_remaining = ceil((strtotime($row['end_date']) - time()) / (60 * 60 * 24));
@@ -171,7 +172,7 @@ if (isset($_GET['id'])) {
                 <div class="membership-card">
                     <div class="d-flex justify-content-between align-items-start mb-4">
                         <div>
-                            <span class="plan-badge"><?php echo $row['plan'] ?> Months Plan</span>
+                            <span class="plan-badge"><?php echo $row['plan'] ?> <?php echo isset($row['plan_type']) ? ucfirst($row['plan_type']) : 'Months'; ?> Plan</span>
                             <h2 class="mt-2 fw-800 mb-0"><?php echo $row['package'] ?></h2>
                         </div>
                         <i class="fas fa-crown fs-1 opacity-25"></i>

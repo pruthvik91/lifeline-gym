@@ -20,20 +20,20 @@ if (count($wa_rows) > 0) {
 
 // Fetch members' contacts
 $contacts = array();
-// $member_query = $conn->query("
-//     SELECT m.contact 
-//     FROM registration_info r 
-//     INNER JOIN members m ON m.id = r.member_id 
-//     WHERE r.status = 1 AND contact != ''
-//     ORDER BY r.id DESC 
-// ");
+$member_query = $conn->query("
+    SELECT m.contact 
+    FROM registration_info r 
+    INNER JOIN members m ON m.id = r.member_id 
+    WHERE r.status = 1 AND contact != ''
+    ORDER BY r.id DESC 
+");
 
-// if($member_query){
-//     while ($row = $member_query->fetch_assoc()) {
-//         $contacts[] = $row['contact'];
-//     }
-// }
-$contacts = ["9638567558"];
+if($member_query){
+    while ($row = $member_query->fetch_assoc()) {
+        $contacts[] = $row['contact'];
+    }
+}
+// $contacts = ["9638567558"];
 // ,9313933076,7990251613,7284002450
 ?>
 <div class="container-fluid py-4">

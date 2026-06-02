@@ -1,7 +1,7 @@
 <?php include 'db_connect.php' ?>
 <?php
 if (isset($_GET['id'])) {
-	$qry = $conn->query("SELECT r.*,p.plan,p.amount as pamount,pp.package,pp.amount as ppamount,concat(m.lastname,' ',m.firstname,' ',m.middlename) as name,m.member_id as mid_no from registration_info r inner join members m on m.id = r.member_id inner join plans p on p.id = r.plan_id inner join packages pp on pp.id = r.package_id where r.id=" . $_GET['id'])->fetch_array();
+	$qry = $conn->query("SELECT r.*,p.plan,p.plan_type,p.amount as pamount,pp.package,pp.amount as ppamount,concat(m.lastname,' ',m.firstname,' ',m.middlename) as name,m.member_id as mid_no from registration_info r inner join members m on m.id = r.member_id inner join plans p on p.id = r.plan_id inner join packages pp on pp.id = r.package_id where r.id=" . $_GET['id'])->fetch_array();
 	foreach ($qry as $k => $v) {
 		$$k = $v;
 	}

@@ -86,7 +86,7 @@
                 <div class="bg-white rounded-4 border border-slate-100 shadow-sm overflow-hidden">
                     <div class="list-group list-group-flush">
                         <?php 
-                        $recent = $conn->query("SELECT r.*, m.firstname, m.lastname, p.plan, pk.package FROM registration_info r INNER JOIN members m ON m.id = r.member_id INNER JOIN plans p ON p.id = r.plan_id INNER JOIN packages pk ON pk.id = r.package_id ORDER BY r.date_created DESC LIMIT 5");
+                        $recent = $conn->query("SELECT r.*, m.firstname, m.lastname, p.plan, p.plan_type, pk.package FROM registration_info r INNER JOIN members m ON m.id = r.member_id INNER JOIN plans p ON p.id = r.plan_id INNER JOIN packages pk ON pk.id = r.package_id ORDER BY r.date_created DESC LIMIT 5");
                         while($row = $recent->fetch_assoc()):
                         ?>
                         <div class="list-group-item p-4 border-slate-50">
@@ -102,7 +102,7 @@
                                 </div>
                                 <div class="text-end">
                                     <div class="extra-small fw-800 text-slate-900"><?php echo date('d M', strtotime($row['date_created'])) ?></div>
-                                    <div class="extra-small text-slate-400 fw-600 mt-1"><?php echo $row['plan'] ?> Months</div>
+                                    <div class="extra-small text-slate-400 fw-600 mt-1"><?php echo $row['plan'] ?> <?php echo isset($row['plan_type']) ? ucfirst($row['plan_type']) : 'Months'; ?></div>
                                 </div>
                             </div>
                         </div>
