@@ -509,6 +509,11 @@ class Action
 					exit;
 				}
 			}
+			if ($_FILES['img']['tmp_name'] != '') {
+				$fname = strtotime(date('y-m-d H:i')) . '_' . $_FILES['img']['name'];
+				$move = move_uploaded_file($_FILES['img']['tmp_name'], 'assets/uploads/' . $fname);
+				$data .= ", profile_pic = '$fname' ";
+			}
 			$save = $this->db->query("INSERT INTO members set $data ");
 			if ($save) {
 				$receipt_id = $this->db->insert_id;
@@ -521,11 +526,6 @@ class Action
 				// $data .= ", batch_id ='$batch_id' ";
 
 				$data .= ", start_date ='" . $start_date . "' ";
-                if ($_FILES['img']['tmp_name'] != '') {
-					$fname = strtotime(date('y-m-d H:i')) . '_' . $_FILES['img']['name'];
-					$move = move_uploaded_file($_FILES['img']['tmp_name'], 'assets/uploads/' . $fname);
-					$data .= ", profile_pic = '$fname' ";
-				}
 				$plan_row = $this->db->query("SELECT * FROM plans where id = $plan_id")->fetch_array();
 				$plan = $plan_row['plan'];
 				$plan_type = isset($plan_row['plan_type']) ? $plan_row['plan_type'] : 'months';

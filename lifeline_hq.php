@@ -1,18 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
 <?php
 session_start();
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
 include('./db_connect.php');
-ob_start();
-if (!isset($_SESSION['system'])) {
-    // $system = $conn->query("SELECT * FROM system_settings limit 1")->fetch_array();
-    // foreach($system as $k => $v){
-    //     $_SESSION['system'][$k] = $v;
-    // }
+if (isset($_SESSION['login_id'])) {
+    header("location:admin-home");
+    exit;
 }
-ob_end_flush();
 ?>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -20,10 +18,6 @@ ob_end_flush();
     <title>LifeLine Fitness</title>
 	
     <?php include('./header.php'); ?>
-    <?php
-    if (isset($_SESSION['login_id']))
-	header("location:admin-home");
-?>
 	<link rel="stylesheet" href="./login.css?v=<?php echo URL_VERSION ?>">
 </head>
 

@@ -1,5 +1,8 @@
 <?php 
 session_start();
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
 include('./db_connect.php');
 
 // Auto-login check
@@ -15,11 +18,13 @@ if(!isset($_SESSION['member_id']) && isset($_COOKIE['member_mid']) && isset($_CO
     }
 }
 
-if(isset($_SESSION['member_id']))
+if(isset($_SESSION['member_id'])){
     header("location:member_dashboard");
-
+    
+}
 $pre_mid = isset($_GET['mid']) ? $_GET['mid'] : (isset($_COOKIE['member_mid']) ? $_COOKIE['member_mid'] : '');
-$pre_phn = isset($_GET['phn']) ? $_GET['phn'] : (isset($_COOKIE['member_phn']) ? $_COOKIE['member_phn'] : '');
+    $pre_phn = isset($_GET['phn']) ? $_GET['phn'] : (isset($_COOKIE['member_phn']) ? $_COOKIE['member_phn'] : '');
+
 ?>
 <!DOCTYPE html>
 <html lang="en">

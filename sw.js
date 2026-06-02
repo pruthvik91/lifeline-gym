@@ -1,6 +1,5 @@
-const CACHE_NAME = 'lifeline-gym-v1';
+const CACHE_NAME = 'lifeline-gym-v3';
 const urlsToCache = [
-  './login.php',
   './manifest.json',
   './assets/img/logo.png'
 ];
@@ -14,6 +13,20 @@ self.addEventListener('install', event => {
   );
 });
 
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+});
+
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
@@ -22,3 +35,4 @@ self.addEventListener('fetch', event => {
       })
   );
 });
+

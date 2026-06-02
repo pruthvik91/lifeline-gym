@@ -1,23 +1,27 @@
+<?php 
+session_start(); 
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+
+if(!isset($_SESSION['login_id'])){
+  if(isset($_GET['admin'])){
+    header('location:lifeline_hq');
+  }else{
+    header('location:login');
+  }
+  exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
-	
-<?php session_start(); ?>
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
   <title>Lifeline Fitness</title>
- 	
-
+  
 <?php
-  if(!isset($_SESSION['login_id'])){
-    if(isset($_GET['admin'])){
-      header('location:lifeline_hq');
-    }else{
-      header('location:login');
-    }
-    exit;
-  }
   include('./header.php'); 
 ?>
 
