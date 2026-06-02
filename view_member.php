@@ -532,7 +532,7 @@ ob_start();
             $expiry = strtotime($row['end_date']);
             $is_expired = ($today > $expiry) || ($row['status'] == 0);
             
-            $payment_result = $conn->query("SELECT * FROM payments where member_id = '$member_id' order by id desc limit 1");
+            $payment_result = $conn->query("SELECT * FROM payments where registration_id = '{$row['id']}' order by id desc limit 1");
             $has_payment = $payment_result->num_rows > 0;
         }
         ?>

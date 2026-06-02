@@ -63,7 +63,7 @@ $('#submitRenew').click(function(){
                 alert_toast("Membership Successfully Renewed","success");
                 end_load();
                 uni_modal("<i class='fa fa-address-card'></i> Member Plan Details",
-                    "view_pdetails.php?id=" + resp, '');
+                    "view_pdetails.php?id=" + resp, 'large');
             }
         }
     })
