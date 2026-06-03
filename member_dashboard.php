@@ -701,7 +701,7 @@ if($data && isset($data['end_date'])){
             ?>
             <div class="notice-card" style="border-left-color: <?php echo $n['border_color'] ?>;">
                 <h4><?php echo $n['title'] ?></h4>
-                <p><?php echo $n['content'] ?></p>
+                <p style="white-space: pre-line;"><?php echo htmlspecialchars($n['content']) ?></p>
                 <div class="notice-date"><?php echo date('d M, Y', strtotime($n['date_created'])) ?></div>
             </div>
             <?php endwhile; else: ?>
